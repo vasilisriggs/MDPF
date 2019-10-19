@@ -29,8 +29,7 @@
 
 Πρόκεται για υλοποίηση B+ Tree πάνω στο δίσκο που χρησιμοποιείται για αποθήκευση κλειδιού-τιμής ( περισσότερες λεπτομέρειες αναφέρονται στο link ).
 
-Wikipedia Link για B+ Trees
-( https://en.wikipedia.org/wiki/B%2B_tree )
+Wikipedia link για B+ Trees https://en.wikipedia.org/wiki/B%2B_tree 
 
 
 ------------------------------------------------------------------------
