@@ -1,5 +1,5 @@
 # MDPF
-Multidimensional Partitioning Framework Based on Query-Aware and Skew-Tolerant Space Filling Curves
+**Multidimensional Partitioning Framework Based on Query-Aware and Skew-Tolerant Space Filling Curves**
 
 Έχουμε το αρχείο data.txt που περιέχει 2 διαστάσεις (X,Y) με 20 στοιχεία ανά διάσταση. 
 Το πρόγραμμα διαβάζει ένα αρχείο data.txt. Διαβάζει αρχικά τα συνολικά στοιχεία ανά διάσταση και έπειτα διαβάζει τον αριθμό των διαστάσεων. Στη περίπτωση μας έχουμε [20,2]. 20 στοιχεία ανά διάσταση και 2 διαστάσεις.
