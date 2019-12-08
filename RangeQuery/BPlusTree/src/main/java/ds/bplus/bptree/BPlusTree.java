@@ -1953,7 +1953,7 @@ public class BPlusTree {
      * @return a TreeNode object referencing to the loaded page
      * @throws IOException is thrown when an I/O operation fails
      */
-    private TreeNode readNode(long index) throws IOException {
+    public TreeNode readNode(long index) throws IOException {
 
         // caution.
         if(index < 0)

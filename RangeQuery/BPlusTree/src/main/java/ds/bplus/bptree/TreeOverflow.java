@@ -12,7 +12,7 @@ import java.util.LinkedList;
  * the key array at all (this could be improved but... well...)
  */
 @SuppressWarnings("unused")
-class TreeOverflow extends TreeNode {
+public class TreeOverflow extends TreeNode {
 
 
     private final LinkedList<String> valueList;
@@ -27,7 +27,7 @@ class TreeOverflow extends TreeNode {
      * @param prevPagePointer the previous leaf or overflow pointer
      * @param pageIndex the page index in the file
      */
-    TreeOverflow(long nextPagePointer, long prevPagePointer,
+    public TreeOverflow(long nextPagePointer, long prevPagePointer,
                  long pageIndex) {
         super(TreeNodeType.TREE_LEAF_OVERFLOW, pageIndex);
         valueList = new LinkedList<>();
@@ -35,28 +35,28 @@ class TreeOverflow extends TreeNode {
         this.prevPagePointer = prevPagePointer;
     }
 
-    void pushToValueList(String value)
+    public void pushToValueList(String value)
         {valueList.push(value);}
 
-    String removeLastValue()
+    public String removeLastValue()
         {return(valueList.removeLast());}
 
-    void addToValueList(int index, String value)
+    public void addToValueList(int index, String value)
         {valueList.add(index, value);}
 
-    String getValueAt(int index)
+    public String getValueAt(int index)
         {return valueList.get(index);}
 
-    long getNextPagePointer()
+    public long getNextPagePointer()
         {return(nextPagePointer);}
 
-    void setNextPagePointer(long next)
+    public void setNextPagePointer(long next)
         {nextPagePointer = next;}
 
     private long getPrevPagePointer()
         {return prevPagePointer;}
 
-    void setPrevPagePointer(long prevPagePointer)
+    public void setPrevPagePointer(long prevPagePointer)
         {this.prevPagePointer = prevPagePointer;}
 
 

@@ -4,7 +4,7 @@ import java.io.IOException;
 import java.io.RandomAccessFile;
 
 @SuppressWarnings("unused")
-class TreeLookupOverflowNode extends TreeNode {
+public class TreeLookupOverflowNode extends TreeNode {
 
     private long next; // next pointer
 
@@ -14,7 +14,7 @@ class TreeLookupOverflowNode extends TreeNode {
      *
      * @param pageIndex the page index in the file
      */
-    TreeLookupOverflowNode(long pageIndex, long nextPointer) {
+    public TreeLookupOverflowNode(long pageIndex, long nextPointer) {
         super(TreeNodeType.TREE_LOOKUP_OVERFLOW, pageIndex);
         this.next = nextPointer;
     }
@@ -65,7 +65,7 @@ class TreeLookupOverflowNode extends TreeNode {
      *
      * @return the next pointer value
      */
-    long getNextPointer() {
+    public long getNextPointer() {
         return next;
     }
 

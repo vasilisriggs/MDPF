@@ -11,8 +11,12 @@ import ds.bplus.bptree.BPlusTreePerformanceCounter;
 import ds.bplus.util.InvalidBTreeStateException;
 
 public class TreeFile {
-	private String rfDirectory = "results";
-	private String treeDirectory = "bins";
+	//private String rfDirectory = "data/results";
+	//private String treeDirectory = "data/bins";
+	private String rfDirectory = "multi/results";
+	private String treeDirectory = "multi/bins";
+	private long timeC = 0L;
+	private long timeZ = 0L;
 	private String filenameC;
 	private String filenameZ;
 	private double minX;
@@ -25,24 +29,26 @@ public class TreeFile {
 	private BPlusTree bpc;
 	private BPlusTree bpz;
 	private int pages;
-	
+	private boolean binariesExisted;
 	
 	public TreeFile(int pageSize, int keySize, int entrySize, ResultFile rf) throws IOException, InvalidBTreeStateException{
+		
 		String readMode = "rw+";
 		this.bconf = new BPlusConfiguration(pageSize,keySize,entrySize);
 		this.bPerf = new BPlusTreePerformanceCounter(true);
 		this.rf = rf;
-		String readFile = rf.getResultFileName();
 		
-		String[] splitFile = readFile.split("_");
-		filenameC = "MyTree_"+splitFile[0]+"_"+splitFile[1]+"_C.bin";
-		filenameZ = "MyTree_"+splitFile[0]+"_"+splitFile[1]+"_Z.bin";
-		pages = Integer.parseInt(splitFile[1]);
+		String readFile = rf.getResultFileName(); 
+		String[] splitFile = readFile.split("\\."); 
+		filenameC = "Tree_"+splitFile[0]+"_"+String.valueOf(pageSize)+"-"+String.valueOf(keySize+"-"+String.valueOf(entrySize))+"_C.bin"; 													
+		filenameZ = "Tree_"+splitFile[0]+"_"+String.valueOf(pageSize)+"-"+String.valueOf(keySize+"-"+String.valueOf(entrySize))+"_Z.bin";
+		pages = rf.getPages();
 		String writeFileC = treeDirectory+"/"+filenameC;
 		String writeFileZ = treeDirectory+"/"+filenameZ;
 		
 		File fc = new File(writeFileC);
 		File fz = new File(writeFileZ);
+		
 		if(fz.exists() && fc.exists()) {
 			System.out.println("Tree files already exist. Reading for values.");
 			readMode = "rw";
@@ -52,14 +58,21 @@ public class TreeFile {
 			maxX = rf.getDataFile().getMaxLongitude();
 			minY = rf.getDataFile().getMinLatitude();
 			maxY = rf.getDataFile().getMaxLatitude();
+			binariesExisted = true;
 			return;
 		}
+		
+		binariesExisted = false;
+		
 		System.out.println("Initializing TreeFile file. Inserting...");
 		BufferedReader br = new BufferedReader(new FileReader(rfDirectory+"/"+readFile));
 		
 		bpc = new BPlusTree(bconf,readMode,writeFileC,bPerf);
 		bpz = new BPlusTree(bconf,readMode,writeFileZ,bPerf);
 		
+		
+		long start;
+		long end;
 		String entry;
 		long keyC;
 		long keyZ;
@@ -68,13 +81,12 @@ public class TreeFile {
 		String[] datas;
 		String line;
 		
-		//
-		line = br.readLine(); // reads dims
-		line = br.readLine(); // reads min and max of X
+		line = br.readLine(); 
+		line = br.readLine(); 
 		minmax = line.split(" ");
 		minX = Double.parseDouble(minmax[0]);
 		maxX = Double.parseDouble(minmax[1]);
-		line = br.readLine(); // reads min and max of Y
+		line = br.readLine(); 
 		minmax = line.split(" ");
 		minY = Double.parseDouble(minmax[0]);
 		maxY = Double.parseDouble(minmax[1]);
@@ -84,23 +96,37 @@ public class TreeFile {
 			entry = datas[0]+"-"+datas[1];
 			keyC = Long.parseLong(datas[2],2);
 			keyZ = Long.parseLong(datas[3],2);
+			start = System.currentTimeMillis();
 			bpc.insertKey(keyC, entry, duplicates);
+			end = System.currentTimeMillis();
+			timeC = timeC + (end-start);
+			start = System.currentTimeMillis();
 			bpz.insertKey(keyZ, entry, duplicates);
+			end = System.currentTimeMillis();
+			timeZ = timeZ + (end-start);
 		}
-		System.out.println("Insertion successful.");
+		
 		bpc.commitTree();
 		bpz.commitTree();
+		System.out.println("Insertion and TreeFiles files:"+filenameC+" "+filenameZ+" were created with success.");
 		bpc.printCurrentConfiguration();
 		br.close();
-		
 	}
 	
-	public BPlusTree getBTreeC(){
-		return bpc;
-	}
-	public BPlusTree getBTreeZ() {
-		return bpz;
-	}
+	public BPlusConfiguration getBConf() 
+	{return bconf;}
+	
+	public BPlusTreePerformanceCounter getBPerf() 
+	{return bPerf;}
+	
+	public boolean binariesExisted() 
+	{return binariesExisted;}
+	
+	public BPlusTree getBTreeC()
+	{return bpc;}
+	
+	public BPlusTree getBTreeZ()
+	{return bpz;}
 	
 	public double getMinX() 
 	{return minX;}
@@ -125,4 +151,10 @@ public class TreeFile {
 	
 	public ResultFile getResultFile() 
 	{return rf;}
+	
+	public long returnTimeC() 
+	{return timeC;}
+	
+	public long returnTimeZ() 
+	{return timeZ;}
 }

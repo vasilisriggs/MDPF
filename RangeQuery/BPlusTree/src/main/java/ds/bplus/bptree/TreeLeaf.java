@@ -12,7 +12,7 @@ import java.util.LinkedList;
  *
  */
 @SuppressWarnings("unused")
-class TreeLeaf extends TreeNode {
+public class TreeLeaf extends TreeNode {
     private long nextPagePointer;           // pointer to next leaf in the list
     private long prevPagePointer;           // pointer to prev leaf in the list
     private LinkedList<String> valueList;   // satellite data list
@@ -26,7 +26,7 @@ class TreeLeaf extends TreeNode {
      * @param nodeType the node type
      * @param pageIndex the index of the page
      */
-    TreeLeaf(long nextPagePointer, long prevPagePointer,
+    public TreeLeaf(long nextPagePointer, long prevPagePointer,
              TreeNodeType nodeType, long pageIndex) {
         super(nodeType, pageIndex);
         if(nodeType == TreeNodeType.TREE_ROOT_LEAF && nextPagePointer > 0)
@@ -38,62 +38,62 @@ class TreeLeaf extends TreeNode {
         this.valueList = new LinkedList<>();
     }
 
-    void addToOverflowList(int index, long value)
+    public void addToOverflowList(int index, long value)
         {overflowList.add(index, value);}
 
-    void addLastToOverflowList(long value)
+    public void addLastToOverflowList(long value)
         {overflowList.addLast(value);}
 
-    void addLastToValueList(String value)
+    public void addLastToValueList(String value)
         {valueList.addLast(value);}
 
-    long getOverflowPointerAt(int index)
+    public long getOverflowPointerAt(int index)
         {return overflowList.get(index);}
 
-    void pushToOverflowList(long overflowPointer)
+    public void pushToOverflowList(long overflowPointer)
         {overflowList.push(overflowPointer);}
 
-    long popOverflowPointer()
+    public long popOverflowPointer()
         {return(overflowList.pop());}
 
-    void setOverflowPointerAt(int index, long value)
+    public void setOverflowPointerAt(int index, long value)
         {overflowList.set(index, value);}
 
-    long removeLastOverflowPointer()
+    public long removeLastOverflowPointer()
         {return(overflowList.removeLast());}
 
-    long getLastOverflowPointer()
+    public long getLastOverflowPointer()
         {return(overflowList.getLast());}
 
-    void addToValueList(int index, String value)
+    public void addToValueList(int index, String value)
         {valueList.add(index, value);}
 
-    String getValueAt(int index)
+    public String getValueAt(int index)
         {return valueList.get(index);}
 
-    void pushToValueList(String value)
+    public void pushToValueList(String value)
         {valueList.push(value);}
 
-    String popValue()
+    public String popValue()
         {return valueList.pop();}
 
-    String removeLastValue()
+    public String removeLastValue()
         {return  valueList.removeLast();}
 
-    long getNextPagePointer()
+    public long getNextPagePointer()
         {return(nextPagePointer);}
 
-    void setNextPagePointer(long next)
+    public void setNextPagePointer(long next)
         {nextPagePointer = next;}
 
-    long getPrevPagePointer()
+    public long getPrevPagePointer()
         {return prevPagePointer;}
 
-    void setPrevPagePointer(long prevPagePointer) {
+    public void setPrevPagePointer(long prevPagePointer) {
         this.prevPagePointer = prevPagePointer;
     }
 
-    String removeEntryAt(int index, BPlusConfiguration conf)
+    public String removeEntryAt(int index, BPlusConfiguration conf)
             throws InvalidBTreeStateException {
         keyArray.remove(index);
         overflowList.remove(index);

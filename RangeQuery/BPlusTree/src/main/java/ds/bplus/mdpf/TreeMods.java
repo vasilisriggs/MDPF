@@ -1,12 +1,24 @@
 package ds.bplus.mdpf;
 
+import static java.lang.Long.MAX_VALUE;
+import java.io.IOException;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 
-import ds.bplus.bptree.BPlusTree;
+import ds.bplus.bptree.*;
+import ds.bplus.object.*;
 
+import ds.bplus.util.InvalidBTreeStateException;
+/**
+ * This class provides functions for a B+ Tree
+ * @author Vasilis
+ *
+ */
 public class TreeMods{
-	
+	//private String tfDirectory = "data/bins";
+	private String tfDirectory = "multi/bins";
+	private String filenameC;
+	private String filenameZ;
 	private TreeFile tf;
 	private double[] mins;
 	private double[] maxs;
@@ -16,11 +28,19 @@ public class TreeMods{
 	private double[] steps;
 	private int rbits;
 	private DecimalFormat df  = new DecimalFormat("#.######");
-	
+	private TimeNumberObject tno;
+	private TimeQuarters tqs;
+	/**
+	 * TreeMods constructor
+	 * @param tf TreeFile reference object
+	 */
 	public TreeMods(TreeFile tf) {
 		this.tf = tf;
 		this.bpc = tf.getBTreeC();
 		this.bpz = tf.getBTreeZ();
+		
+		this.filenameC = tf.getFilenameC();
+		this.filenameZ = tf.getFilenameZ();
 		
 		this.pages = tf.getPages();
 		this.rbits = (int)Math.ceil(Math.log10(pages)/Math.log10(2));
@@ -38,7 +58,167 @@ public class TreeMods{
 			steps[i] = Double.parseDouble(df.format((maxs[i]-mins[i])/pages));
 		}	
 	}
+	/**
+	 * Calculates the time that rangeSearch function iterates through the four quarters of the B+ Tree indexes.
+	 * 
+	 * 
+	 * @param iterations iterations indicates how many times the program will iterate over the time calculations.
+	 * @return an TimeQuarter object that holds reference to the performance times of the rangeSearch function for both C and Z bin files.
+	 * @throws IOException
+	 * @throws InvalidBTreeStateException
+	 */
+	public TimeQuarters resultQuarters(int iterations) throws IOException, InvalidBTreeStateException{ // e.g. pages == 16.
+		
+		long[] startAC = new long[iterations];
+		long[] startBC = new long[iterations];
+		long[] startCC = new long[iterations];
+		long[] startDC = new long[iterations];
+		
+		long[] endAC = new long[iterations];
+		long[] endBC = new long[iterations];
+		long[] endCC = new long[iterations];
+		long[] endDC = new long[iterations];
+		
+		long[] startAZ = new long[iterations];
+		long[] startBZ = new long[iterations];
+		long[] startCZ = new long[iterations];
+		long[] startDZ = new long[iterations];
+		
+		long[] endAZ = new long[iterations];
+		long[] endBZ = new long[iterations];
+		long[] endCZ = new long[iterations];
+		long[] endDZ = new long[iterations];
+		
+		long[] timeAC = new long[iterations];
+		long[] timeBC = new long[iterations];
+		long[] timeCC = new long[iterations];
+		long[] timeDC = new long[iterations];
+		long[] timeAZ = new long[iterations];
+		long[] timeBZ = new long[iterations];
+		long[] timeCZ = new long[iterations];
+		long[] timeDZ = new long[iterations];
+		
+		long sumAC = 0;
+		long sumBC = 0;
+		long sumCC = 0;
+		long sumDC = 0;
+		long sumAZ = 0;
+		long sumBZ = 0;
+		long sumCZ = 0;
+		long sumDZ = 0;
+		
+		long totalQuotas = (pages*pages); // 256
+		long quotaA = totalQuotas/4 - 1; // 64-1 = 63
+		long quotaB = quotaA + totalQuotas/4; // 63+64 = 127 
+		long quotaC = quotaB + totalQuotas/4; // 127+64 = 191
+		long quotaD = quotaC + totalQuotas/4; // 191+64 = 255
+		
+		for(int i=0;i<iterations;i++) {
+			startAC[i] = System.currentTimeMillis();
+			bpc.rangeSearch(0, quotaA, false); // 0-63
+			endAC[i] = System.currentTimeMillis();
+			
+			startBC[i] = System.currentTimeMillis();
+			bpc.rangeSearch(quotaA+1, quotaB, false); // 64 - 127
+			endBC[i] = System.currentTimeMillis();
+			
+			startCC[i] = System.currentTimeMillis();
+			bpc.rangeSearch(quotaB+1, quotaC, false); // 128 - 191
+			endCC[i] = System.currentTimeMillis();
+			
+			startDC[i] = System.currentTimeMillis();
+			bpc.rangeSearch(quotaC+1, quotaD, false); // 192 - 255
+			endDC[i] = System.currentTimeMillis();
+			
+			startAZ[i] = System.currentTimeMillis();
+			bpz.rangeSearch(0, quotaA, false); // 0-63
+			endAZ[i] = System.currentTimeMillis();
+			
+			startBZ[i] = System.currentTimeMillis();
+			bpz.rangeSearch(quotaA + 1, quotaB, false); // 64 - 127
+			endBZ[i] = System.currentTimeMillis();
+			
+			startCZ[i] = System.currentTimeMillis();
+			bpz.rangeSearch(quotaB+1, quotaC, false); // 128 - 191
+			endCZ[i] = System.currentTimeMillis();
+			
+			startDZ[i] = System.currentTimeMillis();
+			bpz.rangeSearch(quotaC+1, quotaD, false); // 192 - 255
+			endDZ[i] = System.currentTimeMillis();
+			
+			
+			timeAC[i] = endAC[i] - startAC[i];
+			timeBC[i] = endBC[i] - startBC[i];
+			timeCC[i] = endCC[i] - startCC[i];
+			timeDC[i] = endDC[i] - startDC[i];
+			timeAZ[i] = endAZ[i] - startAZ[i];
+			timeBZ[i] = endBZ[i] - startBZ[i];
+			timeCZ[i] = endCZ[i] - startCZ[i];
+			timeDZ[i] = endDZ[i] - startDZ[i];
+			
+			sumAC = timeAC[i] + sumAC;
+			sumBC = timeBC[i] + sumBC;
+			sumCC = timeCC[i] + sumCC;
+			sumDC = timeDC[i] + sumDC;
+			sumAZ = timeAZ[i] + sumAZ;
+			sumBZ = timeBZ[i] + sumBZ;
+			sumCZ = timeCZ[i] + sumCZ;
+			sumDZ = timeDZ[i] + sumDZ;
+		}
+		
+		this.tqs = new TimeQuarters((sumAC/iterations),(sumBC/iterations),(sumCC/iterations),(sumDC/iterations),(sumAZ/iterations),(sumBZ/iterations),(sumCZ/iterations),(sumDZ/iterations));
+		
+		return tqs;
+	}
 	
+	public TimeNumberObject resultQuery(double[] lb, double[] ub) throws IOException, InvalidBTreeStateException {
+		ArrayList<Long> longlistC = rangeQuery(lb,ub,"C");
+		ArrayList<Long> longlistZ = rangeQuery(lb,ub,"Z");
+		
+		if((longlistC.size()==0) || (longlistZ.size()==0)){
+			return null;
+		}
+		
+		long startC = System.currentTimeMillis();
+		RangeResult rrC = bpc.rangeSearch(getMinIndexFromList(longlistC),getMaxIndexFromList(longlistC), false);
+		long endC = System.currentTimeMillis();
+		int listSizeC = rrC.getQueryResult().size();
+		
+		long startZ = System.currentTimeMillis();
+		RangeResult rrZ = bpz.rangeSearch(getMinIndexFromList(longlistZ), getMaxIndexFromList(longlistZ), false); // false = allows duplicates.
+		long endZ = System.currentTimeMillis();
+		
+		int listSizeZ = rrZ.getQueryResult().size();
+		this.tno = new TimeNumberObject(endC-startC,endZ-startZ,listSizeC,listSizeZ);	
+		return tno;
+	}
+
+	private long getMinIndexFromList(ArrayList<Long> longlist){
+		long min = MAX_VALUE;
+		for(int i=0;i<longlist.size();i++) {
+			if(longlist.get(i)<min) {
+				min = longlist.get(i);
+			}
+		}
+		return min;
+	}
+	
+	private long getMaxIndexFromList(ArrayList<Long> longlist) {
+		long max = 0;
+		for(int i=0;i<longlist.size();i++) {
+			if(longlist.get(i)>max) {
+				max = longlist.get(i);
+			}
+		}
+		return max;
+	}
+	/**
+	 * Given the bounds and the type of the space filling curve, it calculates and returns which indexes are being filled or "touched" by the bounds in the arguments.
+	 * @param lb lowerBound array
+	 * @param ub upperBound array
+	 * @param curve Curve: C or Z
+	 * @return Returns a list which holds the resulted indexes for a specific curve
+	 */
 	public ArrayList<Long> rangeQuery(double[] lb, double[] ub, String curve){
 		if(curve!="c" && curve!="C" && curve!="z" && curve!="Z") {
 			System.out.println("Wrong Curve. Returning");
@@ -67,19 +247,19 @@ public class TreeMods{
 		long[] maxlong = new long[2];
 		long[] cnt = new long[2];
 		long minIndex;
-		long maxIndex;
+		 long maxIndex;
 		
 		minIndex = findIndex(lb,curve);
 		maxIndex = findIndex(ub,curve);
 		
-		if(curve=="c" || curve=="C") {
+		if(curve=="c" || curve=="C") { // breaking the indexes into the x-y decimal (of the before binary) representation.
 			minlong = revConcat(minIndex);
 			cnt = revConcat(minIndex);
 			maxlong = revConcat(maxIndex);
 			System.out.println(minlong[0]+" "+minlong[1]+" "+maxlong[0]+" "+maxlong[1]);
-			for(int i=(int)minlong[0];i<=maxlong[0];i++) {
-				for(int j=(int)minlong[1];j<=maxlong[1];j++) {
-					longlist.add(findIndexLong(cnt,curve));
+			for(int i=(int)minlong[0];i<=maxlong[0];i++) { // we add every index that is between ( 2-dimensional ) the min and max.
+				for(int j=(int)minlong[1];j<=maxlong[1];j++) { // meaning that we parse the box to get every index(interleaved or concatenated) 
+					longlist.add(findIndexLong(cnt,curve)); // that is inside the lowerBound and upperBound.
 					System.out.println("cnt: "+cnt[0]+" "+cnt[1]);
 					cnt[1]++;
 				}
@@ -103,9 +283,14 @@ public class TreeMods{
 		}	
 		return longlist;
 	}
-	
-	public long findIndex(double[] dat, String curve) { // takes a double[] as an argument which contains a data set and returns the index which this data set is in.
-		long ind = 0;
+	/**
+	 * Calculates on which index, the given point is for the specified curve 
+	 * @param dat represents the point ( data-set )
+	 * @param curve is the curve we are using at the momment
+	 * @return the index that corresponds for the point and the curve
+	 */
+	public long findIndex(double[] dat, String curve) { // takes a double[] as an argument which contains a data set and returns the index 										
+		long ind = 0; //which this data set is in.
 		double temp;
 		int[] index = new int[dat.length];
 		for(int i=0;i<dat.length;i++) {
@@ -144,7 +329,12 @@ public class TreeMods{
 		}
 		return Long.parseLong(b,2);
 	}
-	
+	/**
+	 * 
+	 * @param index is the 2-point indexes of the 2 dimensions
+	 * @param curve is the curve we are on
+	 * @return the space filling curve index
+	 */
 	private long findIndexLong(long[] index, String curve) { // same as findIndex, but here we take a long[] as an argument
 		long indexer = 0L;
 		String[] bins = new String[index.length];
@@ -167,7 +357,11 @@ public class TreeMods{
 		}
 		return indexer;
 	}
-	
+	/**
+	 * Helpful function for rangeQuery - Reverse Concatenation
+	 * @param index index to be dissolved into the initial 2-point index parts
+	 * @return
+	 */
 	private long[] revConcat(long index) { // reverse concatenate
 		String[] bins = new String[2];
 		long[] parts = new long[2];
@@ -183,7 +377,11 @@ public class TreeMods{
 		}
 		return parts;
 	}
-	
+	/**
+	 * Helpful function for rangeQuery - Reverse Interleaving
+	 * @param index index to be dissolved into the initial 2-point index parts
+	 * @return
+	 */
 	private long[] revLeave(long index) { // reverse interleaving
 		String b;
 		int x = 0;
@@ -206,7 +404,7 @@ public class TreeMods{
 			b = "0"+b;
 		}
 		
-		bins = b.split("(?!^)"); // split every char of b[] into bins[].
+		bins = b.split("(?!^)"); // split every char of b into bins[].
 		for(int i=0;i<bins.length;i++) {
 			if((i%2)==0) {
 				binsX[x] = binsX[x] + bins[i];
@@ -246,7 +444,13 @@ public class TreeMods{
 		return Long.parseLong(b,2);
 	}
 	
-	public TreeFile getTreeFile() {
-		return tf;
-	}
+	public TreeFile getTreeFile() 
+	{return tf;}
+	
+	public TimeNumberObject getTimeNumberObject() 
+	{return this.tno;}
+	
+	public TimeQuarters getTimeQuarters()
+	{return this.tqs;}
+	
 }

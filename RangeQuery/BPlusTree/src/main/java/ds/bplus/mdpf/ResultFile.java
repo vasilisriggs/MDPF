@@ -4,15 +4,19 @@ import java.io.*;
 import java.text.DecimalFormat;
 public class ResultFile{
 	
-	private String directory = "results";
-	private String dfDirectory = "data";	
+	//private String directory = "data/results";
+	private String directory = "multi/results"; 
+	//private String dfDirectory = "data/raw";
+	private String dfDirectory = "multi/raw";
+	
 	private String filename;
 	private DataFile df;
+	private int pages;
 	private DecimalFormat decf  = new DecimalFormat("#.######");
 	public ResultFile(DataFile df,int pages) throws IOException {
 		this.df = df;
 		int n = 2;
-
+		this.pages = pages;
 		// files which I am reading and writing on.
 		String readFile = df.getDataFilePath();
 		String[] splitFile = readFile.split("\\.");
@@ -26,7 +30,7 @@ public class ResultFile{
 		}
 		BufferedWriter writer = new BufferedWriter(new FileWriter(writeFile, true));
 
-		int rbits = (int)Math.ceil(Math.log10(pages)/Math.log10(2));
+		int rbits = getBits(pages);
 
 		double[] min = new double[2];
 		double[] max = new double[2];
@@ -146,7 +150,7 @@ public class ResultFile{
 		this.df = null;
 		int r;
 		int n;
-		
+		this.pages = pages;
 		String[] splitFile = readFile.split("\\.");
 		readFile = dfDirectory+"/"+readFile;
 		filename = splitFile[0]+"_"+String.valueOf(pages)+"_res.txt";
@@ -159,7 +163,7 @@ public class ResultFile{
 		BufferedReader br = new BufferedReader(new FileReader(readFile));
 		BufferedWriter writer = new BufferedWriter(new FileWriter(writeFile, true));
 
-		int rbits = (int)Math.ceil(Math.log10(pages)/Math.log10(2));
+		int rbits = getBits(pages);
 
 		double[] min;
 		double[] max;
@@ -307,10 +311,17 @@ public class ResultFile{
 		writer.close();
 		br.close();
 	}
-	public String getResultFileName() {
-		return filename;
+	
+	private int getBits(int a){
+		return (int)Math.ceil(Math.log10(a)/Math.log10(2));
 	}
-	public DataFile getDataFile() {
-		return df;
-	}
+	
+	public int getPages() 
+	{return this.pages;}
+	
+	public String getResultFileName() 
+	{return filename;}
+	
+	public DataFile getDataFile() 
+	{return df;}
 }

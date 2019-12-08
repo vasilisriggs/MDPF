@@ -10,7 +10,7 @@ import java.util.LinkedList;
  * Class for our Internal nodes
  *
  */
-class TreeInternalNode extends TreeNode {
+public class TreeInternalNode extends TreeNode {
 
     private final LinkedList<Long> pointerArray;  // the pointer array
 
@@ -20,36 +20,36 @@ class TreeInternalNode extends TreeNode {
      * @param nodeType the node type parameter
      * @param pageIndex the index of the page
      */
-    TreeInternalNode(TreeNodeType nodeType, long pageIndex) {
+    public TreeInternalNode(TreeNodeType nodeType, long pageIndex) {
         super(nodeType, pageIndex);
         pointerArray = new LinkedList<>();
     }
 
-    void removePointerAt(int index)
+    public void removePointerAt(int index)
         {pointerArray.remove(index);}
 
-    long getPointerAt(int index) {
+    public long getPointerAt(int index) {
         return((index < 0 || index >= pointerArray.size()) ? -1 : pointerArray.get(index));}
 
-    long popPointer()
+    public long popPointer()
         {return(pointerArray.pop());}
 
-    long removeLastPointer()
+    public long removeLastPointer()
         {return(pointerArray.removeLast());}
 
-    void addPointerAt(int index, long val)
+    public void addPointerAt(int index, long val)
         {pointerArray.add(index, val);}
 
-    void addPointerLast(long val)
+    public void addPointerLast(long val)
         {pointerArray.addLast(val);}
 
-    void setPointerAt(int index, long val)
+    public void setPointerAt(int index, long val)
         {pointerArray.set(index, val);}
 
-    int getPointerListSize()
+    public int getPointerListSize()
         {return(pointerArray.size());}
 
-    void pushToPointerArray(long val)
+    public void pushToPointerArray(long val)
         {pointerArray.push(val);}
 
 
