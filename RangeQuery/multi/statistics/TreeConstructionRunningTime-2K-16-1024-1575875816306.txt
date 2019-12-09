@@ -1,0 +1,12 @@
+Tree Construction Times for 5 Files
+
+Tree_2K_1_16_res_1024-8-24_C.bin: 3087
+Tree_2K_1_16_res_1024-8-24_Z.bin: 3106
+Tree_2K_2_16_res_1024-8-24_C.bin: 3106
+Tree_2K_2_16_res_1024-8-24_Z.bin: 2910
+Tree_2K_3_16_res_1024-8-24_C.bin: 2954
+Tree_2K_3_16_res_1024-8-24_Z.bin: 2956
+Tree_2K_4_16_res_1024-8-24_C.bin: 3031
+Tree_2K_4_16_res_1024-8-24_Z.bin: 3005
+Tree_2K_5_16_res_1024-8-24_C.bin: 2954
+Tree_2K_5_16_res_1024-8-24_Z.bin: 2930
