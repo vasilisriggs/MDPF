@@ -1,9 +1,15 @@
 package ds.bplus.mdpf;
 
 import static java.lang.Long.MAX_VALUE;
+
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.LinkedList;
 
 import ds.bplus.bptree.*;
 import ds.bplus.object.*;
@@ -17,6 +23,7 @@ import ds.bplus.util.InvalidBTreeStateException;
 public class TreeMods{
 	//private String tfDirectory = "data/bins";
 	private String tfDirectory = "multi/bins";
+	private String stDirectory = "multi/statistics";
 	private String filenameC;
 	private String filenameZ;
 	private TreeFile tf;
@@ -28,7 +35,6 @@ public class TreeMods{
 	private double[] steps;
 	private int rbits;
 	private DecimalFormat df  = new DecimalFormat("#.######");
-	private TimeNumberObject tno;
 	private TimeQuarters tqs;
 	/**
 	 * TreeMods constructor
@@ -39,7 +45,7 @@ public class TreeMods{
 		this.bpc = tf.getBTreeC();
 		this.bpz = tf.getBTreeZ();
 		
-		this.filenameC = tf.getFilenameC();
+		this.filenameC = tf.getFilenameC(); // Tree_2K_4_res_1024_8_24.
 		this.filenameZ = tf.getFilenameZ();
 		
 		this.pages = tf.getPages();
@@ -171,28 +177,303 @@ public class TreeMods{
 		return tqs;
 	}
 	
-	public TimeNumberObject resultQuery(double[] lb, double[] ub) throws IOException, InvalidBTreeStateException {
-		ArrayList<Long> longlistC = rangeQuery(lb,ub,"C");
-		ArrayList<Long> longlistZ = rangeQuery(lb,ub,"Z");
+	public void getLeafElements() throws IOException, InvalidBTreeStateException{
+		// Tree_2K_1_16_res_1024-8-24_C.bin
+		// Tree_3K_16_res_1024-8-24_C.bin
 		
-		if((longlistC.size()==0) || (longlistZ.size()==0)){
-			return null;
+		String[] line = filenameC.split("_");
+		String prefix = "LeafElements";
+		// multi file
+		// String filefix = line[1]+"_"+line[2]+"_"+line[4]+"_"+line[5];
+		// single file
+		String filefix = line[1]+"_"+line[2]+"_"+line[4];
+		String filenames = prefix+"-"+filefix;
+		
+		String writeFileC = stDirectory+"/"+filenames+"_C.txt";
+		String writeFileZ = stDirectory+"/"+filenames+"_Z.txt";
+		
+		File fc = new File(writeFileC);
+		File fz = new File(writeFileZ);
+		
+		if(fc.exists()||fz.exists()){
+			System.out.println(filenames+"_C.txt or "+filenames+"_Z.txt already exists");
+			return;
 		}
 		
-		long startC = System.currentTimeMillis();
-		RangeResult rrC = bpc.rangeSearch(getMinIndexFromList(longlistC),getMaxIndexFromList(longlistC), false);
-		long endC = System.currentTimeMillis();
-		int listSizeC = rrC.getQueryResult().size();
+		BufferedWriter writerC = new BufferedWriter(new FileWriter(writeFileC, true));
 		
-		long startZ = System.currentTimeMillis();
-		RangeResult rrZ = bpz.rangeSearch(getMinIndexFromList(longlistZ), getMaxIndexFromList(longlistZ), false); // false = allows duplicates.
-		long endZ = System.currentTimeMillis();
+		long lower=0;
+		long upper=0;
+		long maxIndex = (pages*pages)-1;
+		SearchResult sr;
+		int cnt = 1;
+		String chars = "";
+		int maxChars = 3;
+		int capacity = 0;
 		
-		int listSizeZ = rrZ.getQueryResult().size();
-		this.tno = new TimeNumberObject(endC-startC,endZ-startZ,listSizeC,listSizeZ);	
-		return tno;
+		writerC.append("Leaf-Index	NumberOfIndexes	Range");
+		
+		while(upper<maxIndex){
+			writerC.newLine();
+			sr = bpc.searchKey(lower, true);
+			capacity = sr.getLeaf().getCurrentCapacity();
+			upper = lower+capacity-1;
+			chars = String.valueOf(cnt);
+			while(chars.length()<maxChars) {
+				chars = "0"+chars;
+			}
+			writerC.append(chars+" "+String.valueOf(capacity)+" "+String.valueOf(lower)+"-"+String.valueOf(upper));
+			
+			lower = upper+1;
+			cnt++;
+		}			
+		
+		writerC.close();
+		System.out.println(filenames+"_C.txt was created successfully.");
+		
+		BufferedWriter writerZ = new BufferedWriter(new FileWriter(writeFileZ, true));
+		writerZ.append("Leaf-Index	NumberOfIndexes	Range");
+		lower = 0;
+		upper = 0;
+		cnt = 1;
+		
+		while(upper<maxIndex) {
+			writerZ.newLine();
+			sr = bpz.searchKey(lower, true);
+			capacity = sr.getLeaf().getCurrentCapacity();
+			upper = lower+capacity-1;
+			chars = String.valueOf(cnt);
+			while(chars.length()<maxChars) {
+				chars = "0"+chars;
+			}
+			writerZ.append(chars+" "+String.valueOf(capacity)+" "+String.valueOf(lower)+"-"+String.valueOf(upper));
+			
+			lower = upper+1;
+			cnt++;
+		}
+		writerZ.close();
+		System.out.println(filenames+"_Z.txt was created successfully.");
 	}
 
+	/**	This function realizes a range query. The rangeSearch on the .bin file consists of a range between the
+	 * minimum and the maximum index of each Curve-List. rangeSearch([minIndex,maxIndex]). Returns all values.
+	 * Refinement happens on the RangeResult object.
+	 * @param lb is the lowerBound array for the 2-dim
+	 * @param  ub is the upperBound array for the 2-dim
+	 * @return a QueryComponentsObject object
+	 * @throws InvalidBTreeStateException 
+	 * @throws IOException 
+	 */
+	public QueryComponentsObject rangeQuery(double[] lb, double[] ub) throws IOException, InvalidBTreeStateException{
+		ArrayList<Long> longListC = resultQuery(lb,ub,"C");
+		ArrayList<Long> longListZ = resultQuery(lb,ub,"Z");
+		
+		int falsePosC = 0;
+		int falsePosZ = 0;
+		
+		boolean nonDupes = false;	
+		
+		long minIndex = getMinIndexFromList(longListC);
+		long maxIndex = getMaxIndexFromList(longListC);
+		
+		long startC = System.currentTimeMillis();
+		RangeResult rrC = bpc.rangeSearch(minIndex, maxIndex, nonDupes); // using getMinIndexFromList() and --Max--() inside rangeSearch() will make it take more time.
+		falsePosC = falsePosC + rrC.getQueryResult().size();
+		refineQuery(lb,ub,rrC);
+		falsePosC = falsePosC - rrC.getQueryResult().size();
+		long endC = System.currentTimeMillis();
+		long totalC = endC - startC;
+		
+		minIndex = getMinIndexFromList(longListZ);
+		maxIndex = getMaxIndexFromList(longListZ);
+		
+		long startZ = System.currentTimeMillis();
+		RangeResult rrZ = bpz.rangeSearch(minIndex, maxIndex, nonDupes);
+		falsePosZ = falsePosZ + rrZ.getQueryResult().size();
+		refineQuery(lb,ub,rrZ);
+		falsePosZ = falsePosZ - rrZ.getQueryResult().size();
+		long endZ = System.currentTimeMillis();
+		long totalZ = endZ - startZ;
+		
+		QueryComponentsObject qco  = new QueryComponentsObject(totalC,totalZ,rrC.getQueryResult().size(),rrZ.getQueryResult().size(), falsePosC, falsePosZ);
+		
+		System.out.println(falsePosC);
+		System.out.println(falsePosZ);
+		return qco;	
+ 	}
+	
+	public QueryComponentsObject fractionsQuery(double[] lb, double[] ub) throws IOException, InvalidBTreeStateException {
+		ArrayList<Long> longListC = resultQuery(lb,ub,"C");
+		ArrayList<Long> longListZ = resultQuery(lb,ub,"Z");
+		
+		boolean nonDupes = false;
+		
+		int falsePosC = 0;
+		int falsePosZ = 0;
+		
+		int totalSizeC = 0;
+		int totalSizeZ = 0;
+		
+		long startC = 0;
+		long startZ = 0;
+		long endC = 0;
+		long endZ = 0;
+		long totalC = 0;
+		long totalZ = 0;
+		
+		RangeResult rrC;
+		RangeResult rrZ;
+		
+		for(int i=0;i<longListC.size();i++) {
+			startC = System.currentTimeMillis();
+			rrC = bpc.rangeSearch(longListC.get(i), longListC.get(i), nonDupes);
+			falsePosC = falsePosC + rrC.getQueryResult().size();
+			refineQuery(lb,ub,rrC);
+			falsePosC = falsePosC - rrC.getQueryResult().size();
+			endC = System.currentTimeMillis();
+			totalC = totalC + (endC-startC);
+			totalSizeC = totalSizeC + rrC.getQueryResult().size();
+		}
+		
+		for(int i=0;i<longListZ.size();i++) {
+			startZ = System.currentTimeMillis();
+			rrZ = bpz.rangeSearch(longListZ.get(i), longListZ.get(i), nonDupes);
+			falsePosZ = falsePosZ + rrZ.getQueryResult().size();
+			refineQuery(lb,ub,rrZ);
+			falsePosZ = falsePosZ - rrZ.getQueryResult().size();
+			endZ = System.currentTimeMillis();
+			totalZ = totalZ + (endZ-startZ);
+			totalSizeZ = totalSizeZ + rrZ.getQueryResult().size();
+		}
+		
+		QueryComponentsObject tmo = new QueryComponentsObject(totalC,totalZ,totalSizeC,totalSizeZ,falsePosC,falsePosZ);
+		return tmo;
+	}
+	
+	public QueryComponentsObject rangeFractionsQuery(double[] lb, double[] ub) throws IOException, InvalidBTreeStateException {
+		ArrayList<Long> longListC = resultQuery(lb,ub,"C");
+		ArrayList<Long> longListZ = resultQuery(lb,ub,"Z");
+		
+		int falsePosC = 0;
+		int falsePosZ = 0;
+		
+		boolean nonDupes = false;
+		
+		
+		
+		long start;
+		long end;
+		long totalC = 0;
+		long totalZ = 0;
+		
+		RangeResult rrC;
+		RangeResult rrZ;
+		
+		int totalSizeC = 0;
+		int totalSizeZ = 0;
+		
+		long min = 0;
+		long max = 0;
+		
+		
+		
+		min = longListC.get(0);
+		max = longListC.get(0);
+		
+		for(int i=1;i<longListC.size();i++) {
+			// as long as the next "value" on the list is bigger and it is actually a next number, we add it to the range.
+			// else, we break the loop and calculate rangeSearch() where the range ended up being.
+			// List example (indexes) : 2, 4, 5, 7, 10, 9, 11, 12
+			// The ranges are: [2], [4,5], [7], [10], [9], [11,12]
+			if((longListC.get(i)<min)||(longListC.get(i)-max>1)) {
+				start = System.currentTimeMillis();		
+				rrC = bpc.rangeSearch(min, max, nonDupes);
+						
+				falsePosC = falsePosC + rrC.getQueryResult().size();
+				refineQuery(lb,ub,rrC);
+				falsePosC = falsePosC - rrC.getQueryResult().size();
+				end = System.currentTimeMillis();
+				totalC = totalC + (end-start);
+				totalSizeC = totalSizeC + rrC.getQueryResult().size();
+				
+				min = longListC.get(i);
+				max = longListC.get(i);
+			}
+			max = longListC.get(i);
+		}
+		
+		start = System.currentTimeMillis();
+		rrC = bpc.rangeSearch(min, max, nonDupes);
+		falsePosC = falsePosC + rrC.getQueryResult().size();
+		refineQuery(lb,ub,rrC);
+		falsePosC = falsePosC  - rrC.getQueryResult().size();
+		end = System.currentTimeMillis();
+		totalC = totalC + (end-start);
+		totalSizeC = totalSizeC + rrC.getQueryResult().size();
+		
+		min = longListZ.get(0);
+		max = longListZ.get(0);
+		
+		for(int i=1;i<longListZ.size();i++) {
+			if((longListZ.get(i)<min)||(longListZ.get(i)-max>1)) {
+		
+				start = System.currentTimeMillis();
+				rrZ = bpz.rangeSearch(min, max, nonDupes);
+				falsePosZ = falsePosZ + rrZ.getQueryResult().size();
+				refineQuery(lb,ub,rrZ);
+				falsePosZ = falsePosZ  - rrZ.getQueryResult().size();
+				end = System.currentTimeMillis();
+				totalZ = totalZ + (end-start);
+				totalSizeZ = totalSizeZ + rrZ.getQueryResult().size();
+				
+				min = longListZ.get(i);
+				max = longListZ.get(i);		
+			}
+			max = longListZ.get(i);
+		}
+		
+		start = System.currentTimeMillis();
+		rrZ = bpz.rangeSearch(min, max, nonDupes);
+		falsePosZ = falsePosZ + rrZ.getQueryResult().size();
+		refineQuery(lb,ub,rrZ);
+		falsePosZ = falsePosZ  - rrZ.getQueryResult().size();
+		end = System.currentTimeMillis();
+		totalZ = totalZ + (end-start);
+		totalSizeZ = totalSizeZ + rrZ.getQueryResult().size();
+		
+		QueryComponentsObject qco = new QueryComponentsObject(totalC,totalZ,totalSizeC,totalSizeZ,falsePosC,falsePosZ);
+		
+		return qco;
+		
+	}
+	
+	private void refineQuery(double[] lb, double[] ub, RangeResult rr) {
+		
+		BigDecimal xMin = BigDecimal.valueOf(lb[0]);
+		BigDecimal yMin = BigDecimal.valueOf(lb[1]);
+		
+		BigDecimal xMax = BigDecimal.valueOf(ub[0]);
+		BigDecimal yMax = BigDecimal.valueOf(ub[1]);
+		
+		String line;
+		String[] arr = new String[2];
+		
+		BigDecimal[] bg = new BigDecimal[2];
+		
+		for(int i=0;i<rr.getQueryResult().size();i++) {
+			
+			line = rr.getQueryResult().get(i).getValue();
+			arr = line.split(",");
+			bg[0] = BigDecimal.valueOf(Double.parseDouble(arr[0])); // x value
+			bg[1] = BigDecimal.valueOf(Double.parseDouble(arr[1])); // y value
+			
+			if(!(((bg[0].compareTo(xMin)>=0)&&(bg[0].compareTo(xMax)<=0))&&((bg[1].compareTo(yMin)>=0)&&(bg[1].compareTo(yMax)<=0)))){
+				rr.getQueryResult().remove(i);
+				i--;
+			}
+		}
+	}
+	
 	private long getMinIndexFromList(ArrayList<Long> longlist){
 		long min = MAX_VALUE;
 		for(int i=0;i<longlist.size();i++) {
@@ -219,7 +500,7 @@ public class TreeMods{
 	 * @param curve Curve: C or Z
 	 * @return Returns a list which holds the resulted indexes for a specific curve
 	 */
-	public ArrayList<Long> rangeQuery(double[] lb, double[] ub, String curve){
+	private ArrayList<Long> resultQuery(double[] lb, double[] ub, String curve){
 		if(curve!="c" && curve!="C" && curve!="z" && curve!="Z") {
 			System.out.println("Wrong Curve. Returning");
 			return null;
@@ -247,7 +528,7 @@ public class TreeMods{
 		long[] maxlong = new long[2];
 		long[] cnt = new long[2];
 		long minIndex;
-		 long maxIndex;
+		long maxIndex;
 		
 		minIndex = findIndex(lb,curve);
 		maxIndex = findIndex(ub,curve);
@@ -260,7 +541,7 @@ public class TreeMods{
 			for(int i=(int)minlong[0];i<=maxlong[0];i++) { // we add every index that is between ( 2-dimensional ) the min and max.
 				for(int j=(int)minlong[1];j<=maxlong[1];j++) { // meaning that we parse the box to get every index(interleaved or concatenated) 
 					longlist.add(findIndexLong(cnt,curve)); // that is inside the lowerBound and upperBound.
-					System.out.println("cnt: "+cnt[0]+" "+cnt[1]);
+					// System.out.println("cnt: "+cnt[0]+" "+cnt[1]);
 					cnt[1]++;
 				}
 				cnt[1] = minlong[1];
@@ -274,7 +555,7 @@ public class TreeMods{
 			for(int i=(int)minlong[0];i<=maxlong[0];i++) {
 				for(int j=(int)minlong[1];j<=maxlong[1];j++) {
 					longlist.add(findIndexLong(cnt,curve));
-					System.out.println("cnt: "+cnt[0]+" "+cnt[1]);
+					// System.out.println("cnt: "+cnt[0]+" "+cnt[1]);
 					cnt[1]++;
 				}
 				cnt[1] = minlong[1];
@@ -447,10 +728,7 @@ public class TreeMods{
 	public TreeFile getTreeFile() 
 	{return tf;}
 	
-	public TimeNumberObject getTimeNumberObject() 
-	{return this.tno;}
 	
 	public TimeQuarters getTimeQuarters()
 	{return this.tqs;}
-	
 }
