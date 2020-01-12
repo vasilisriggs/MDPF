@@ -22,7 +22,7 @@ public class DataFile{
 		private String filefix;
 		private String filename;
 				
-		private String directory = "data/raw";
+		private String directory = "multi/raw";
 		
 		private int rows;
 		
