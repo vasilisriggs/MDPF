@@ -13,7 +13,7 @@ public class ManageFiles{
 	
 	private final int numberOfIterations = 1;
 	
-	public ManageFiles(int numberOfFiles, int elements , int pages, int pageSize, int keySize, int entrySize, boolean statFiles, boolean timeQuartersManager, boolean fileMods) throws IOException, InvalidBTreeStateException {
+	public ManageFiles(int numberOfFiles, int elements , int pages, int pageSize, int keySize, int entrySize, boolean statFiles, boolean timeQuartersManager, boolean fileMods, boolean leafElements) throws IOException, InvalidBTreeStateException {
 		String fileSuffix = String.valueOf(numberOfFiles);
 		long[][] blockNums = new long[numberOfFiles][2];
 		long[][] times = new long[numberOfFiles][2];
@@ -46,13 +46,16 @@ public class ManageFiles{
 			if(statFiles) {
 				sf[i] = new StatFile(rf[i]);  
 			}
+			if(leafElements&&tf[0].binariesExisted()){
+				tm[i].getLeafElements();
+			}
 		}
 		
 		if(timeQuartersManager) {
 			TimeQuarterManager tqm = new TimeQuarterManager(df, rf, tf, tm, numberOfIterations);
 		}
 		
-		if(tf[0].binariesExisted()&&fileMods) {
+		if(!tf[0].binariesExisted()&&fileMods) {
 			FileMods fm = new FileMods();
 			fm.storeTreeTimes(df[0].returnFileFix(), rf[0].getPages(), tf[0].getBTreeC().getTreeConfiguration().getPageSize(), names, times);
 			fm.storeTreeBlocks(df[0].returnFileFix(), rf[0].getPages(), tf[0].getBTreeC().getTreeConfiguration().getPageSize(), names, blockNums);
