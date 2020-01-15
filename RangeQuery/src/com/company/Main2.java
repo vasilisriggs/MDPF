@@ -14,7 +14,7 @@ import ds.bplus.util.InvalidBTreeStateException;
 
 public class Main2{
 	public static void main(String[] args) throws IOException, InvalidBTreeStateException {
-		double[] lb = new double[2];
+		/*double[] lb = new double[2];
 		double[] ub = new double[2];
 		
 		lb[0] = -125.731711; // x min 
@@ -28,6 +28,9 @@ public class Main2{
 		
 		tm.getLeafElements();
 		
+		*/
+		
+		/*
 		QueryComponentsObject qco1 = tm.rangeQuery(lb, ub);
 		QueryComponentsObject qco2 = tm.fractionsQuery(lb, ub);
 		QueryComponentsObject qco3 = tm.rangeFractionsQuery(lb, ub);
@@ -35,6 +38,7 @@ public class Main2{
 		System.out.println(qco1.getRecordsC()+", "+qco1.getRecordsZ());
 		System.out.println(qco2.getRecordsC()+", "+qco2.getRecordsZ());
 		System.out.println(qco3.getRecordsC()+", "+qco3.getRecordsZ());
+		*/
 		
 		/*
 		System.out.println("Reading 3k.txt file for original result");
@@ -68,9 +72,39 @@ public class Main2{
 		}
 		
 		br.close();
-		System.out.println(cnt); */
+		System.out.println(cnt); 
+		*/
 		
-		//ManageFiles mf = new ManageFiles(1, 20000, 16, 1024, 8, 24, false, false, true, true); // ManageFiles(numberOfFiles, elements, pages, pageSize, keySize, entrySize, statFiles?, TQM?, filemods?, leafElements?)	
+		// ManageFiles mf = new ManageFiles(1, 1000000, 256, 2048, 8, 24, false, false, true, true); // ManageFiles(numberOfFiles, elements, pages, pageSize, keySize, entrySize, statFiles?, TQM?, filemods?, leafElements?)
+		
+		int[] sizes = new int[5];
+		int[] blockSizes = new int[5];
+		int[] pages = new int[5];
+		
+		sizes[0] = 100000;
+		sizes[1] = 500000;
+		sizes[2] = 1000000;
+		sizes[3] = 5000000;
+		sizes[4] = 10000000;
+		
+		blockSizes[0] = 1048576;
+		blockSizes[1] = 2097152;
+		blockSizes[2] = 4194304;
+		blockSizes[3] = 8388608;
+		blockSizes[4] = 18777216;
+		
+		pages[0] = 1024;
+		pages[1] = 2048;
+		pages[2] = 4096;
+		pages[3] = 8192;
+		pages[4] = 16384;
+			
+		for(int i=0;i<sizes.length;i++) {
+			for(int j=0;j<blockSizes.length;j++) {
+				for(int k=0;k<pages.length;k++) {
+					ManageFiles mf = new ManageFiles(5, sizes[i], pages[j], blockSizes[k], 8, 24, false, false, true, true);
+				}
+			}
+		}		
 	}
-	
 }
