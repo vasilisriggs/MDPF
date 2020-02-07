@@ -54,13 +54,16 @@
 				tempd = Double.parseDouble(decf.format((Double.parseDouble(datas[i])-min[i])/steps[i]));
 				if(tempd>=(double)pages){
 					indexing[i] = pages-1;
-				}else if(tempd==0.0){ //has to do with negative indexing which I'm trying to defeat with this line.
+				}else if(tempd==0.0){ 
+				//has to do with negative indexing which I'm trying to defeat with this line.
 					indexing[i] = 0;
 				}else{
 					indexing[i] = (int)(Math.ceil(tempd)-1);
 				}
 			} 
-			// binary represenation. rbits = 3 (for 8 pages, so i'll zero pad numbers that have less than 3 bits; 1->001, 				11->011, etc.)
+			// binary represenation. rbits = 3 
+			//(for 8 pages, so i'll zero pad numbers that have less than 3 bits;
+			//1->001,11->011, etc.)
 			for(int i=0;i<indexing.length;i++){
 				b = Integer.toBinaryString(indexing[i]);
 				while(b.length()<rbits){
