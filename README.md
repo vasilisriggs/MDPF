@@ -153,8 +153,8 @@ RangeQuery/BPlusTree/src/main/java/ds/bplus/**mdpf/**
 
 **DataFile.java**: 
 
-Η κλάση DataFile παίρνει ως όρισμα τον αριθμό των στοιχείων και δημιουργεί ένα αρχείο raw.txt.
-Ένα αρχείο raw.txt περιέχει μια κεφαλίδα:
+Η κλάση **DataFile** παίρνει ως όρισμα τον αριθμό των στοιχείων και δημιουργεί ένα αρχείο raw.txt.
+Ένα αρχείο **raw.txt** περιέχει μια κεφαλίδα:
 		
 		NumberOfElements	Dimensions	//Header
 		.element1(x1, y1, ... n1)		//Elements..
@@ -180,7 +180,7 @@ RangeQuery/BPlusTree/src/main/java/ds/bplus/**mdpf/**
 
 		RangeQuery/multi/raw/100K.txt
 
-Η κλάση χειρίζεται και την περίπτωση δημιουργίας πολλαπλών αρχείων raw ίδιου αριθμού στοιχείων. Πραγματοποιείται απλή αρίθμηση στο σύνολο αυτών.
+Η κλάση χειρίζεται και την περίπτωση δημιουργίας πολλαπλών αρχείων **raw** ίδιου αριθμού στοιχείων.
 		
 		RangeQuery/multi/raw/100K_1.txt
 		RangeQuery/multi/raw/100K_2.txt
@@ -188,9 +188,19 @@ RangeQuery/BPlusTree/src/main/java/ds/bplus/**mdpf/**
 		RangeQuery/multi/raw/100K_4.txt
 		RangeQuery/multi/raw/100K_5.txt
 	
-	
-	
+
 **ResultFile.java**: 
+
+Η κλάση **ResultFile** παίρνει ως όρισμα ένα **DataFile instance object** καθώς και έναν ακέραιο αριθμό **pages** που ορίζει σε πόσα "κομμάτια" θα χωριστεί η κάθε διάσταση προκειμένου να δημιουργηθούν τα χωρία στον (δισ)διάστατο χώρο.
+
+Διαβάζει το αρχείο DataFile (που βρίσκεται στη μνήμη, σε κάποιο κατάλογο, είτε δίνοντας το όνομα του αρχείου raw, είτε δίνοντας το όρισμα του DataFile object.)
+
+		ResultFile rf = new ResultFile(new DataFile(100000), pages)
+						ή
+		ResultFile rf = new ResultFile("100K.txt", pages)
+		
+Ο πρώτος τρόπος είναι πιο χρηστικός και προτιμότερος για πολλαπλά αρχεία.
+
 
 
 
