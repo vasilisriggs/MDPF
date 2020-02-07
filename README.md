@@ -230,7 +230,7 @@ RangeQuery/BPlusTree/src/main/java/ds/bplus/**mdpf/**
 		
 **TreeFile.java**:
 
-Η κλάση **TreeFile** παίρνει ως όρισμα ένα ResultFile instance object καθώς και ένα σετ μεταβλητών ( ακέραιοι ) που αρχικοποιούν ένα δέντρο B+ Tree.
+Η κλάση **TreeFile** παίρνει ως όρισμα ένα **ResultFile instance object** καθώς και ένα σετ μεταβλητών ( ακέραιοι ) που αρχικοποιούν ένα δέντρο B+ Tree.
 
 Ο **constructor** της κλάσης είναι (απλοποιημένη μορφή):
 
@@ -286,7 +286,7 @@ RangeQuery/BPlusTree/src/main/java/ds/bplus/**mdpf/**
 		checkDegreeValidity();
     }
 
-1) **pageSize** ορίζει το μέγιστο μέγεθος που μπορεί να έχει ένα Block σε Bytes. Ο υπολογιστής μπορεί να διαβάζει ένα τέτοιο block κάθε φορά πριν αναγκαστεί να το "πετάξει" από τη μνήμη για να διαβάσει ένα άλλο.
+1) **pageSize** ορίζει το μέγιστο μέγεθος που μπορεί να έχει ένα Block σε Bytes.
 
 2) **keySize** ορίζει το μέγεθος σε Bytes του κλειδιού (ή αναγνωριστικού) κάθε στοιχείου.
 
@@ -351,4 +351,33 @@ RangeQuery/BPlusTree/src/main/java/ds/bplus/**mdpf/**
 	private int totalInternalNodeDeletions;
 	private int totalLeafNodeDeletions;
 	private int totalOverflowPagesDeletions;
+
+
+Στον ίδιο constructor της TreeFile, στη εισάγω τα στοιχεία του Result Object instance:
+
+	while((line = br.readLine()) != null) {
+		datas = line.split(" ");
+		entry = datas[0]+","+datas[1];
+	
+		keyC = Long.parseLong(datas[2],2);
+		keyZ = Long.parseLong(datas[3],2);
+	
+		bpc.insertKey(keyC, entry, duplicates);
+		bpz.insertKey(keyZ, entry, duplicates);	
+	}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
