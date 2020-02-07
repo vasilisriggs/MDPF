@@ -246,6 +246,7 @@ RangeQuery/BPlusTree/src/main/java/ds/bplus/**mdpf/**
 
 Η κλάση BPlusConfiguration ουσιαστικά αρχικοποιεί το δέντρο με τις παραμέτρους **pageSize**, **keySize**, **entrySize**.
 		
+		
 	/**
      	* Overloaded constructor
      	*
