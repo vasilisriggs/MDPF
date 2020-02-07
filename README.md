@@ -296,9 +296,9 @@ RangeQuery/BPlusTree/src/main/java/ds/bplus/**mdpf/**
 Η κλάση **BPlusTreePerformanceCounter** χρησιμοποιείται για να κρατάει record για τα metrics του δέντρου. Ο costructor είναι:
 		
 	public BPlusTreePerformanceCounter(boolean trackIO) {
-        	this.trackIO = trackIO;
-        	resetAllMetrics();
-    	}
+		this.trackIO = trackIO;
+		resetAllMetrics();
+	}
 	
 Τα metrics της είναι:
 
