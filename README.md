@@ -254,8 +254,8 @@ RangeQuery/BPlusTree/src/main/java/ds/bplus/**mdpf/**
      	* @param entrySize satellite data (default is 20 bytes)
      	*/
     	public BPlusConfiguration(int pageSize, int keySize, int entrySize) {
-        	basicParams(pageSize, keySize, entrySize);
-        	initializeCommon(pageSize, keySize, entrySize, 1000);
+        		basicParams(pageSize, keySize, entrySize);
+        		initializeCommon(pageSize, keySize, entrySize, 1000);
     	}
 
 
