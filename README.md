@@ -353,7 +353,7 @@ RangeQuery/BPlusTree/src/main/java/ds/bplus/**mdpf/**
 	private int totalOverflowPagesDeletions;
 
 
-Στον ίδιο constructor της **TreeFile**, εισάγω τα στοιχεία του **Result Object instance**:
+Στον ίδιο constructor της **TreeFile**, εισάγω τα στοιχεία του **Result object instance**:
 
 	while((line = br.readLine()) != null) {
 		datas = line.split(" ");
