@@ -293,6 +293,63 @@ RangeQuery/BPlusTree/src/main/java/ds/bplus/**mdpf/**
 3) **entrySize** ορίζει το μέγεθος σε Bytes των χρήσιμων δεδομένων (payload, satellite data).
 
 
+Η κλάση **BPlusTreePerformanceCounter** χρησιμοποιείται για να κρατάει record για τα metrics του δέντρου. Ο costructor είναι:
+		
+	public BPlusTreePerformanceCounter(boolean trackIO) {
+        	this.trackIO = trackIO;
+        	resetAllMetrics();
+    	}
+	
+Τα metrics της είναι:
 
+	private int totalNodeReads;
+    	private int totalInternalNodeReads;
+	private int totalLeafNodeReads;
+    	private int totalOverflowReads;
 
+    	private int totalNodeWrites;
+    	private int totalInternalNodeWrites;
+    	private int totalLeafNodeWrites;
+    	private int totalOverflowWrites;
+	
+	
+    	private int totalInsertionReads;
+    	private int totalDeletionReads;
+    	private int totalSearchReads;
+    	private int totalRangeQueryReads;
+    	private int totalInsertionWrites;
+    	private int totalDeletionWrites;
+    	private int totalSearchWrites;
+    	private int totalRangeQueryWrites;
+	
+    	private int pageReads;
+    	private int pageWrites;
+	
+    	private int pageInternalReads;
+    	private int pageLeafReads;
+    	private int pageOverflowReads;
+	
+    	private int pageInternalWrites;
+    	private int pageLeafWrites;
+    	private int pageOverflowWrites;
+	
+    	private int totalInsertions;
+    	private int totalDeletions;
+    	private int totalSearches;
+    	private int totalRangeQueries;
+	
+    	private int totalSplits;
+    	private int totalRootSplits;
+    	private int totalInternalNodeSplits;
+    	private int totalLeafSplits;
+	
+	
+    	private int totalPages;
+    	private int totalOverflowPages;
+    	private int totalInternalNodes;
+    	private int totalLeaves;
+	
+    	private int totalInternalNodeDeletions;
+    	private int totalLeafNodeDeletions;
+    	private int totalOverflowPagesDeletions;
 
