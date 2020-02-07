@@ -258,7 +258,13 @@ RangeQuery/BPlusTree/src/main/java/ds/bplus/**mdpf/**
 		initializeCommons(pageSize, keySize, entrySize, 1000);
 	}
 
+με 
 
+	private void basicParams(int pageSize, int keySize, int entrySize) {
+        	this.pageSize = pageSize;   // page size (in bytes)
+        	this.entrySize = entrySize; // entry size (in bytes)
+        	this.keySize = keySize;     // key size (in bytes)
+	}
 
 
 
