@@ -283,7 +283,7 @@ RangeQuery/BPlusTree/src/main/java/ds/bplus/**mdpf/**
         	this.overflowPageDegree = calculateDegree(entrySize, leafHeaderSize);
         	this.lookupOverflowPageDegree = calculateDegree(keySize,
                 lookupOverflowHeaderSize);
-        c	heckDegreeValidity();
+       	 	checkDegreeValidity();
     }
 
 
