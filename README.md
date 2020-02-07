@@ -353,7 +353,7 @@ RangeQuery/BPlusTree/src/main/java/ds/bplus/**mdpf/**
 	private int totalOverflowPagesDeletions;
 
 
-Στον ίδιο constructor της TreeFile, στη εισάγω τα στοιχεία του Result Object instance:
+Στον ίδιο constructor της **TreeFile**, εισάγω τα στοιχεία του **Result Object instance**:
 
 	while((line = br.readLine()) != null) {
 		datas = line.split(" ");
@@ -366,8 +366,28 @@ RangeQuery/BPlusTree/src/main/java/ds/bplus/**mdpf/**
 		bpz.insertKey(keyZ, entry, duplicates);	
 	}
 
-
-
+Τα **bpc** και **bpz** είναι αντικείμενα κλάσης **BPlusTree**:
+	
+	bpc = new BPlusTree(bconf,readMode,writeFileC,bPerf);
+	bpz = new BPlusTree(bconf,readMode,writeFileZ,bPerf);
+	
+με **bconf**, **readMode** και **bPerf** όπως ορίστηκαν παραπάνω. Το **writeFileC** και **writeFileZ** είναι τα ονόματα των αρχείων δέντρου. Για κάθε αρχείο **result** παράγονται δέντρα για κάθε τεχνική ένωσης bits.
+	
+	RangeQuery/multi/bins/Tree_100K_8_res_1024_8_24_C.bin
+	RangeQuery/multi/bins/Tree_100K_8_res_1024_8_24_Z.bin
+	
+και για πολλαπλά αρχεία
+	
+	RangeQuery/multi/bins/Tree_100K_1_8_res_1024_8_24_C.bin
+	RangeQuery/multi/bins/Tree_100K_1_8_res_1024_8_24_Z.bin
+	RangeQuery/multi/bins/Tree_100K_2_8_res_1024_8_24_C.bin
+	RangeQuery/multi/bins/Tree_100K_2_8_res_1024_8_24_Z.bin
+	RangeQuery/multi/bins/Tree_100K_3_8_res_1024_8_24_C.bin
+	RangeQuery/multi/bins/Tree_100K_3_8_res_1024_8_24_Z.bin
+	RangeQuery/multi/bins/Tree_100K_4_8_res_1024_8_24_C.bin
+	RangeQuery/multi/bins/Tree_100K_4_8_res_1024_8_24_Z.bin
+	RangeQuery/multi/bins/Tree_100K_5_8_res_1024_8_24_C.bin
+	RangeQuery/multi/bins/Tree_100K_5_8_res_1024_8_24_Z.bin
 
 
 
