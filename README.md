@@ -151,7 +151,9 @@ RangeQuery/BPlusTree/src/main/java/ds/bplus/**mdpf/**
 Τα αρχεία του φάκελου αυτού επρόκειτω για δική μου υλοποίηση.
 Πιο συγκεκριμένα:
 
-**DataFile.java**: Η κλάση DataFile παίρνει ως όρισμα τον αριθμό των στοιχείων και δημιουργεί ένα αρχείο raw.txt.
+**DataFile.java**: 
+
+Η κλάση DataFile παίρνει ως όρισμα τον αριθμό των στοιχείων και δημιουργεί ένα αρχείο raw.txt.
 Ένα αρχείο raw.txt περιέχει μια κεφαλίδα:
 		
 		NumberOfElements	Dimensions	//Header
@@ -160,7 +162,7 @@ RangeQuery/BPlusTree/src/main/java/ds/bplus/**mdpf/**
 		.
 		.
 		.
-Τα στοιχεία είναι Random(), μοντελοποιούν συντεταγμένες (στα όρια των ΗΠΑ) με δεκαδική ακρίβεια 6 ψηφίων
+Τα στοιχεία είναι **Random()**, μοντελοποιούν συντεταγμένες (στα όρια των ΗΠΑ) με δεκαδική ακρίβεια **6** ψηφίων
 	
 	DecimalFormat df  = new DecimalFormat("#.######");
 	
