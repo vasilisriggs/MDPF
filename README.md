@@ -148,8 +148,7 @@ RangeQuery/BPlusTree/src/main/java/ds/bplus/**bptree/**
 
 RangeQuery/BPlusTree/src/main/java/ds/bplus/**mdpf/**
 
-Τα αρχεία του φάκελου αυτού επρόκειτω για δική μου υλοποίηση.
-Πιο συγκεκριμένα:
+Τα αρχεία του φάκελου αυτού επρόκειτω για δική μου υλοποίηση. Πιο συγκεκριμένα:
 
 **DataFile.java**: 
 
@@ -233,16 +232,35 @@ RangeQuery/BPlusTree/src/main/java/ds/bplus/**mdpf/**
 
 Η κλάση TreeFile παίρνει ως όρισμα ένα ResultFile instance object καθώς και ένα σετ μεταβλητών ( ακέραιοι ) που αρχικοποιούν ένα δέντρο B+ Tree.
 
-Ο constructor της κλάσης είναι:
+Ο constructor της κλάσης είναι (απλοποιημένη μορφή):
 
 	private BPlusConfiguration bconf;
 	private BPlusTreePerformanceCounter bPerf;
 
 	public TreeFile(int pageSize, int keySize, int entrySize, ResultFile rf) throws IOException, InvalidBTreeStateException{
-	
 		String readMode = "rw+";
 		this.bconf = new BPlusConfiguration(pageSize,keySize,entrySize);
 		this.bPerf = new BPlusTreePerformanceCounter(true);
 		this.rf = rf;
 	}
+
+Η κλάση BPlusConfiguration ουσιαστικά αρχικοποιεί το δέντρο με τις παραμέτρους **pageSize**, **keySize**, **entrySize**.
+		
+	/**
+     	* Overloaded constructor
+     	*
+     	* @param pageSize page size (default is 1024 bytes)
+     	* @param keySize key size (default is long [8 bytes])
+     	* @param entrySize satellite data (default is 20 bytes)
+     	*/
+    	public BPlusConfiguration(int pageSize, int keySize, int entrySize) {
+        	basicParams(pageSize, keySize, entrySize);
+        	initializeCommon(pageSize, keySize, entrySize, 1000);
+    	}
+
+
+
+
+
+
 
