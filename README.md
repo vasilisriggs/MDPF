@@ -303,53 +303,52 @@ RangeQuery/BPlusTree/src/main/java/ds/bplus/**mdpf/**
 Τα metrics της είναι:
 
 	private int totalNodeReads;
-    	private int totalInternalNodeReads;
+	private int totalInternalNodeReads;
 	private int totalLeafNodeReads;
-    	private int totalOverflowReads;
-
-    	private int totalNodeWrites;
-    	private int totalInternalNodeWrites;
-    	private int totalLeafNodeWrites;
-    	private int totalOverflowWrites;
+	private int totalOverflowReads;
 	
+	private int totalNodeWrites;
+	private int totalInternalNodeWrites;
+	private int totalLeafNodeWrites;
+	private int totalOverflowWrites;
+			
+	private int totalInsertionReads;
+	private int totalDeletionReads;
+	private int totalSearchReads;
+	private int totalRangeQueryReads;
+	private int totalInsertionWrites;
+	private int totalDeletionWrites;
+	private int totalSearchWrites;
+	private int totalRangeQueryWrites;
+		
+	private int pageReads;
+	private int pageWrites;
+		
+	private int pageInternalReads;
+	private int pageLeafReads;
+	private int pageOverflowReads;
 	
-    	private int totalInsertionReads;
-    	private int totalDeletionReads;
-    	private int totalSearchReads;
-    	private int totalRangeQueryReads;
-    	private int totalInsertionWrites;
-    	private int totalDeletionWrites;
-    	private int totalSearchWrites;
-    	private int totalRangeQueryWrites;
+	private int pageInternalWrites;
+	private int pageLeafWrites;
+	private int pageOverflowWrites;
+		
+	private int totalInsertions;
+	private int totalDeletions;
+	private int totalSearches;
+	private int totalRangeQueries;
+		
+	private int totalSplits;
+	private int totalRootSplits;
+	private int totalInternalNodeSplits;
+	private int totalLeafSplits;
+		
+		
+	private int totalPages;
+	private int totalOverflowPages;
+	private int totalInternalNodes;
+	private int totalLeaves;
 	
-    	private int pageReads;
-    	private int pageWrites;
-	
-    	private int pageInternalReads;
-    	private int pageLeafReads;
-    	private int pageOverflowReads;
-	
-    	private int pageInternalWrites;
-    	private int pageLeafWrites;
-    	private int pageOverflowWrites;
-	
-    	private int totalInsertions;
-    	private int totalDeletions;
-    	private int totalSearches;
-    	private int totalRangeQueries;
-	
-    	private int totalSplits;
-    	private int totalRootSplits;
-    	private int totalInternalNodeSplits;
-    	private int totalLeafSplits;
-	
-	
-    	private int totalPages;
-    	private int totalOverflowPages;
-    	private int totalInternalNodes;
-    	private int totalLeaves;
-	
-    	private int totalInternalNodeDeletions;
-    	private int totalLeafNodeDeletions;
-    	private int totalOverflowPagesDeletions;
+	private int totalInternalNodeDeletions;
+	private int totalLeafNodeDeletions;
+	private int totalOverflowPagesDeletions;
 
