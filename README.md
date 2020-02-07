@@ -111,17 +111,17 @@
 
 Στη συνέχεια, διαβάζω ένα αρχείο results για αποθηκεύσω τα στοιχεία αυτά σε ένα αρχείο tree που υλοποιεί ενα B+ Tree.
 
-		while((line = br.readLine()) != null) {
+	while((line = br.readLine()) != null) {
 		
-			datas = line.split(" ");
-			entry = datas[0]+","+datas[1];
+		datas = line.split(" ");
+		entry = datas[0]+","+datas[1];
 			
-			keyC = Long.parseLong(datas[2],2);
-			keyZ = Long.parseLong(datas[3],2);
-			
-			bpc.insertKey(keyC, entry, duplicates);
-			bpz.insertKey(keyZ, entry, duplicates)
-		}
+		keyC = Long.parseLong(datas[2],2);
+		keyZ = Long.parseLong(datas[3],2);
+		
+		bpc.insertKey(keyC, entry, duplicates);
+		bpz.insertKey(keyZ, entry, duplicates)
+	}
 
 Δημιουργώ έτσι δύο αρχεία δέντρων tree για κάθε αρχείο results, καθώς οι μέθοδοι ένωσης των bits πρέπει να μελετηθούν ανεξάρτητα.
 Τα αρχεία αυτά είναι:
