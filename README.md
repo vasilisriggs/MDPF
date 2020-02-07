@@ -230,9 +230,9 @@ RangeQuery/BPlusTree/src/main/java/ds/bplus/**mdpf/**
 		
 **TreeFile.java**:
 
-Η κλάση TreeFile παίρνει ως όρισμα ένα ResultFile instance object καθώς και ένα σετ μεταβλητών ( ακέραιοι ) που αρχικοποιούν ένα δέντρο B+ Tree.
+Η κλάση **TreeFile** παίρνει ως όρισμα ένα ResultFile instance object καθώς και ένα σετ μεταβλητών ( ακέραιοι ) που αρχικοποιούν ένα δέντρο B+ Tree.
 
-Ο constructor της κλάσης είναι (απλοποιημένη μορφή):
+Ο **constructor** της κλάσης είναι (απλοποιημένη μορφή):
 
 	private BPlusConfiguration bconf;
 	private BPlusTreePerformanceCounter bPerf;
@@ -244,7 +244,7 @@ RangeQuery/BPlusTree/src/main/java/ds/bplus/**mdpf/**
 		this.rf = rf;
 	}
 
-Η κλάση BPlusConfiguration ουσιαστικά αρχικοποιεί το δέντρο με τις παραμέτρους **pageSize**, **keySize**, **entrySize**.
+Η κλάση **BPlusConfiguration** ουσιαστικά αρχικοποιεί το δέντρο με τις παραμέτρους **pageSize**, **keySize**, **entrySize**.
 		
 		
 	/**
