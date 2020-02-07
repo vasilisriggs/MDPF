@@ -154,8 +154,8 @@ RangeQuery/BPlusTree/src/main/java/ds/bplus/**mdpf/**
 **DataFile.java**: Η κλάση DataFile παίρνει ως όρισμα τον αριθμό των στοιχείων και δημιουργεί ένα αρχείο raw.txt.
 Ένα αρχείο raw.txt περιέχει μια κεφαλίδα:
 		
-		NumberOfElements	Dimensions
-		.element1(x1, y1, ... n1)
+		NumberOfElements	Dimensions	//Header
+		.element1(x1, y1, ... n1)		//Elements..
 		.element2(x2, y2, ... n2)
 		.
 		.
