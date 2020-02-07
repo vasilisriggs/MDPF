@@ -290,7 +290,7 @@ RangeQuery/BPlusTree/src/main/java/ds/bplus/**mdpf/**
 
 Το **keySize** ορίζει το μέγεθος σε Bytes του κλειδιού (ή αναγνωριστικού) κάθε στοιχείου.
 
-Το **entrySize** ορίζει το μέγεθος σε Bytes των χρήσιμων δεδομένων (payload, sattelite data).
+Το **entrySize** ορίζει το μέγεθος σε Bytes των χρήσιμων δεδομένων (payload, satellite data).
 
 
 
