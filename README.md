@@ -248,16 +248,15 @@ RangeQuery/BPlusTree/src/main/java/ds/bplus/**mdpf/**
 		
 		
 	/**
-     	* Overloaded constructor
-     	*
-     	* @param pageSize page size (default is 1024 bytes)
-     	* @param keySize key size (default is long [8 bytes])
-     	* @param entrySize satellite data (default is 20 bytes)
-     	*/
-    	public BPlusConfiguration(int pageSize, int keySize, int entrySize) {
-        		basicParams(pageSize, keySize, entrySize);
-        		initializeCommon(pageSize, keySize, entrySize, 1000);
-    	}
+	*
+	*@param pageSize page size (default is 1024 bytes)
+	*@param keySize key size (default is long [8 bytes])
+	*@param entrySize satellite data (default is 20 bytes)
+	*/
+	public BPlusConfiguration(int pageSize, int keySize, int entrySize){
+		basicParams(pageSize, keySize, entrySize);
+		initializeCommons(pageSize, keySize, entrySize, 1000);
+	}
 
 
 
