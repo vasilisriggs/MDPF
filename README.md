@@ -27,8 +27,8 @@
 Κάθε στοιχείο του αρχείου raw "πέφτει" πάνω σε ενα συγκεκριμένο χωρίο. Κάθε χωρίο αποτελείται από διαστάσεις και κάθε διάσταση είναι αριθμημένη ==> [0, pages-1] σε δυαδική αναπαράσταση. Έχοντας την δυαδική αναπαράσταση ( bits ) της κάθε διάστασης του χωρίου, μπορώ να ενώσω με 2 ( στην παρούσα εργασία ) τρόπους τα bits προκειμένου να προσδώσω ένα συγκεκριμένο αναγνωριστικό στα χωρία ( και συνεπώς στα στοιχεία που "πέφτουν" πάνω στα χωρία αυτά ). Μετά την ένωση των bits των δυαδικών αναπαραστάσεων της κάθε διάστασης, θα προκύψει ένας αριθμός μεταξύ του 0 και του (pages^n)-1, όπου n ο αριθμός των διαστάσεων και κάθε αριθμός που ανήκει σε αυτά τα όρια θα δωθεί αμφιμονοσήμαντα σε κάθε χωρίο. Να διευκρινίσω ότι χειρίζομαι μία μόνο μέθοδο ένωσης bits κάθε φορά και καθεμία από αυτές τις δύο μεθόδους αποτελεί ξεχωριστό αντικείμενο μελέτης.
 
 Έχουμε 2 τρόπους ένωσης των bits.
-1) Concatenation 
-2) Interleaving
+1) Concatenation (C-Curve)
+2) Interleaving	 (Z-Curve) 	
 
 Έστω pages = 8. Συνεπώς έχουμε 3 bits για κάθε δυαδική αναπαράσταση. Επιπλέον έχουμε δύο (2) διαστάσεις. Οπότε έχουμε συνολικά 64 χωρία που δημιουργούνται στο χώρο [0,63].
 
@@ -39,9 +39,59 @@
 	Concatenation Method ==> x1x2x3y1y2y3 ή y1y2y3x1x2x3
 	Interleaving  Method ==> x1y1x2y2x3y3 ή y1x1y2x2y3x3
 	
-	Ο δεκαδικός αριθμός που προκύπτει αποτελεί το μοναδικό αναγνωριστικό για κάθε χωρίο. Επίσης ξέρουμε ότι ισχύει ότι αν υψώσουμε 
-	στο τετράγωνο έναν αριθμό, τα ελάχιστα bits αυτού διπλασιάζονται. Γνωρίζουμε ότι ο δυαδικός αριθμός 111111 είναι ο αριθμός 63.
-	Σε κάθε χωρίο προσδίδεται ένα μοναδικό ( για κάθε μέθοδο ) αναγνωριστικό.
+	Ο δεκαδικός αριθμός που προκύπτει αποτελεί το μοναδικό αναγνωριστικό για κάθε χωρίο και 
+	σεκάθε στοιχείο που "πέφτει" πάνω σε εκείνο το χωρίο προσδίδεται αυτό το αναγνωριστικό.
+
+Διαβάζουμε ένα αρχείο raw και δημιουργούμε ένα αρχείο results όπως περιέγραψα παραπανω.
+
+		while((line = br.readLine()) != null){
+			writer.newLine();
+			datas = line.split(" ");
+			// find on which pages this set of values is.
+			for(int i=0;i<datas.length;i++){
+				writer.append(datas[i]);
+				writer.append(' ');
+				tempd = Double.parseDouble(decf.format((Double.parseDouble(datas[i])-min[i])/steps[i]));
+				if(tempd>=(double)pages){
+					indexing[i] = pages-1;
+				}else if(tempd==0.0){ //has to do with negative indexing which I'm trying to defeat with this line.
+					indexing[i] = 0;
+				}else{
+					indexing[i] = (int)(Math.ceil(tempd)-1);
+				}
+			} 
+			// binary represenation. rbits = 3 (for 8 pages, so i'll zero pad numbers that have less than 3 bits; 1->001, 				11->011, etc.)
+			for(int i=0;i<indexing.length;i++){
+				b = Integer.toBinaryString(indexing[i]);
+				while(b.length()<rbits){
+					b = "0"+b;
+				}
+				bins[i] = b.toString().trim();
+			}
+			// interleaving.
+			for(int i=0;i<bins.length;i++){
+				binholder = bins[i].split("(?!^)");
+				for(int j=0;j<rbits;j++){
+					binswap[j][i] = binholder[j];
+				}
+			}
+			b = "";
+			for(int i=0;i<rbits;i++){
+				for(int j=0;j<n;j++){
+					b = b + binswap[i][j];
+				}
+			}
+			z = b;
+			//concatenate.
+			b="";
+			for(int i=0;i<bins.length;i++){
+				b = b+bins[i];
+			}
+			c = b;
+			writer.append(c);
+			writer.append(' ');
+			writer.append(z);
+		}
 
 
 
