@@ -396,7 +396,34 @@ RangeQuery/BPlusTree/src/main/java/ds/bplus/**mdpf/**
 
 
 
+**TreeMods.java**:
 
+Η κλάση **TreeMods** διαχειρίζεται αντικείμενο **TreeFile**. Ο constructor της είναι:
+
+	public TreeMods(TreeFile tf) {
+		this.tf = tf;
+		this.bpc = tf.getBTreeC();
+		this.bpz = tf.getBTreeZ();
+		
+		this.filenameC = tf.getFilenameC();
+		this.filenameZ = tf.getFilenameZ();
+		
+		this.pages = tf.getPages();
+		this.rbits = (int)Math.ceil(Math.log10(pages)/Math.log10(2));
+		
+		this.steps = new double[2];
+		this.mins = new double[2];
+		this.maxs = new double[2];
+		
+		mins[0] = tf.getMinX();
+		mins[1] = tf.getMinY();
+		maxs[0] = tf.getMaxX();
+		maxs[1] = tf.getMaxY();
+		
+		for(int i=0;i<steps.length;i++){
+			steps[i] = Double.parseDouble(df.format((maxs[i]-mins[i])/pages));
+		}	
+	}
 
 
 
