@@ -389,8 +389,10 @@ RangeQuery/BPlusTree/src/main/java/ds/bplus/**mdpf/**
 	RangeQuery/multi/bins/Tree_100K_5_8_res_1024_8_24_C.bin
 	RangeQuery/multi/bins/Tree_100K_5_8_res_1024_8_24_Z.bin
 
-
-
+με 
+1) pageSize  = 1024
+2) keySize   = 8
+3) entrySize = 24 
 
 
 
