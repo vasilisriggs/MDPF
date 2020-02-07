@@ -266,7 +266,25 @@ RangeQuery/BPlusTree/src/main/java/ds/bplus/**mdpf/**
         	this.keySize = keySize;     // key size (in bytes)
 	}
 
+και 
 
+	private void initializeCommon(int pageSize, int keySize, int entrySize, int conditionThreshold) {
+        	this.headerSize =                                   // header size in bytes
+                	(Integer.SIZE * 4 + 4 * Long.SIZE) / 8;
+        	this.internalNodeHeaderSize = (Short.SIZE + Integer.SIZE) / 8; // 6 bytes
+        	this.leafHeaderSize = (Short.SIZE + 2 * Long.SIZE + Integer.SIZE) / 8; // 22 bytes
+        	this.lookupOverflowHeaderSize = 14;
+        	this.lookupPageSize = pageSize - headerSize;        // lookup page size
+        	this.conditionThreshold = conditionThreshold;       // iterations for conditioning
+        	// now calculate the tree degree
+        	this.treeDegree = calculateDegree(2*keySize, internalNodeHeaderSize);
+        	// leaf & overflow have the same header size.
+        	this.leafNodeDegree = calculateDegree((2*keySize)+entrySize, leafHeaderSize);
+        	this.overflowPageDegree = calculateDegree(entrySize, leafHeaderSize);
+        	this.lookupOverflowPageDegree = calculateDegree(keySize,
+                lookupOverflowHeaderSize);
+        c	heckDegreeValidity();
+    }
 
 
 
