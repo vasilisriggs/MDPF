@@ -434,11 +434,16 @@ RangeQuery/BPlusTree/src/main/java/ds/bplus/**mdpf/**
 
 **Παραγωγή αρχείων:**
 
-Κατανομή: Ομοιόμορφη/Κανονική. (τυπική απόκλιση σ~0.05).
+* Κατανομή: 
+	* Ομοιόμορφη/Κανονική. (τυπική απόκλιση σ~0.05).
 * Αριθμός Στοιχείων 100K ( 100 χιλιάδες )
 	* pageSize = [1024, 2048, 4096, 8192, 16384] (Bytes)
 	* pages = [256, 512, 1024, 2048, 4096]
 	* 5 ξεχωριστά αρχεία για κάθε συνδυασμό
 * Για κάθε ένα από τα αρχεία αυτά:
-	* Key-Value-InsertionTime-100_x_pageSize[i]-8-24_C(ή Z).bin: Μετράει το χρόνο της κάθε εισαγωγής στο δέντρο.
-	* TreeBlockNumber-100K-pages[i]-pageSize[i]-System.currentTimeMillis().txt: Για όλα τα διαφορετικά αρχεία, για το συγκεκριμένο 		συνδυασμό pages και blockSize εμφανίζει το σύνολο των blocks σύμφωνα με το getTreeConfiguration().getPageSize() πάνω σε ένα 		δέντρο. Υπολογίζει και για το C και για το Z.
+	* **Key-Value-InsertionTime-100K_x_pages[i]_res_pageSize[i]-8-24_C(ή Z).bin**: Μετράει το χρόνο της κάθε εισαγωγής στο δέντρο.
+	* **TreeBlockNumber-100K-pages[i]-pageSize[i]-System.currentTimeMillis().txt**: Για όλα τα διαφορετικά αρχεία, για το 			συγκεκριμένο συνδυασμό pages και blockSize εμφανίζει το σύνολο των blocks σύμφωνα με το **getTreeConfiguration().getPageSize()**
+	πάνω σε ένα δέντρο. Υπολογίζει και για το C και για το Z.
+	* **LeafElements-100K_x_pages[i]_res_blockSize[i]-8-24_C(ή Ζ).txt**:
+	* **TreeConstructionTime-100K-pages[i]-pageSize[i]-System.currentTimeMillis().txt** : Για όλα τα 5 διαφορετικά αρχεία, για το 		συγκεκριμένο συνδυασμό **pages** και **blockSize** εμφανίζει τον συνολικό χρόνο για τη δημιουργία των αρχείων δέντρου .bin για C 	 και Z.
+	
