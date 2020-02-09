@@ -434,33 +434,38 @@ RangeQuery/BPlusTree/src/main/java/ds/bplus/**mdpf/**
 	LeafElements-100K_1_256_res_1024-8-24_C.txt
 	και
 	LeafElements-100K_1_256_res_1024-8-24_Z.txt
-	
-που περιέχουν τον αριθμό και το εύρος των indices που βρίσκοντα σε κάθε Κόμβο Τύπου Φύλλου.
+που περιέχουν τον αριθμό και το εύρος των **indices** που βρίσκοντα σε κάθε **Κόμβο Τύπου Φύλλου**.
 
 Η μέθοδος ξεκινά από το πρώτο κλειδί (0) και τελειώνει στο τελευταίο ( (page^2)-1 ).
 Αρχικά ψάχνω για το κλειδί **lower**
 
 	SearchResult sr;
 	sr = bpc.searchKey(lower, true);   // lower --> κλειδί
-	
 και έπειτα αφού το βρω 
 
 	capacity = sr.getLeaf().getCurrentCapacity();
-	
 βρίσκω την χωρητικότητα του φύλλου που βρίσκεται το συγκεκριμένο κλειδί. Για να αποθηκεύσω το εύρος των indices στο αρχείο, έχω και μία μεταβλητή που καθορίζει το άνω φράγμα στο εύρος ( για αποθήκευση στο αρχείο )
 	
 	upper = lower+capacity-1;
 Τέλος, 
 	
 	lower = upper+1;
-	
 αυξάνω το κλειδί κατά 1 σε σχέση με το τρέχον άνω φράγμα του εύρους για την επόμενη επανάληψη.
-Η διαδικασία αυτή επαναλαμβάνεται όσο η μεταβλητή upper είναι μικρότερη του τελευταίου κλειδιού ( (page^2)-1 ).
-	
-	
-	
+Η διαδικασία αυτή επαναλαμβάνεται όσο η μεταβλητή **upper** είναι μικρότερη του τελευταίου κλειδιού ( (page^2)-1 ).
+
+
+
 
 * **public QueryComponentsObject rangeQuery(double[] lb, double[] ub)**
+
+Η μέθοδος αυτή παίρνει ως όρισμα δύο δισδιάστατους πίνακες ( αφού είμαστε στις δύο διαστάσεις )
+	
+	double[] lb 	// lowerBound array containing minimum real values ( not indices )
+	double[] ub	// upperBound array containing maximum real values ( not indices )
+
+
+	
+
 * **public QueryComponentsObject fractionsQuery(double[] lb, double[] ub)**
 * **public QueryComponentsObject rangeFractionsQuery(double[] lb, double[] ub)**
 
