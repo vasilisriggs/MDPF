@@ -425,7 +425,11 @@ RangeQuery/BPlusTree/src/main/java/ds/bplus/**mdpf/**
 		}	
 	}
 
-
+Η κλάση αυτή περιέχει τις ακόλουθες μεθόδους που εφαρμόζονται πάνω στα δέντρα.
+		* public void getLeafElements()
+		* public QueryComponentsObject rangeQuery(double[] lb, double[] ub)
+		* public QueryComponentsObject fractionsQuery(double[] lb, double[] ub)
+		* public QueryComponentsObject rangeFractionsQuery(double[] lb, double[] ub)
 
 
 
