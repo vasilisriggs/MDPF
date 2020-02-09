@@ -433,7 +433,6 @@ RangeQuery/BPlusTree/src/main/java/ds/bplus/**mdpf/**
 	LeafElements-100K_1_256_res_1024-8-24_C.txt
 	και
 	LeafElements-100K_1_256_res_1024-8-24_Z.txt
-	
 που περιέχουν τον αριθμό και το εύρος των indices που βρίσκοντα σε κάθε Κόμβο Τύπου Φύλλου.
 
 Η μέθοδος ξεκινά από το πρώτο κλειδί (0) και τελειώνει στο τελευταίο ( (page^2)-1 ).
@@ -441,11 +440,9 @@ RangeQuery/BPlusTree/src/main/java/ds/bplus/**mdpf/**
 
 	SearchResult sr;
 	sr = bpc.searchKey(lower, true);   // lower --> κλειδί
-
 και έπειτα αφού το βρω 
 
 	capacity = sr.getLeaf().getCurrentCapacity();
-	
 βρίσκω την χωρητικότητα του φύλλου που βρίσκεται το συγκεκριμένο κλειδί. Για να αποθηκεύσω το εύρος των indices στο αρχείο, έχω και μία μεταβλητή που καθορίζει το άνω φράγμα στο εύρος ( για αποθήκευση στο αρχείο )
 	
 	upper = lower+capacity-1;
