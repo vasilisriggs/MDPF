@@ -497,7 +497,7 @@ RangeQuery/BPlusTree/src/main/java/ds/bplus/**mdpf/**
 	revLeave(index) // reverse interleaving
 	
 εφαρμόζουν αντίθετη μέθοδο indexing προκειμένου να σπάσουν το **index** στα αρχικά χωρία με σύνολο τιμών [0, pages-1] για κάθε διάσταση.
-Για παράδειγμα
+Για παράδειγμα:
 
 **Reverse Concatenation**:
 	
