@@ -627,7 +627,7 @@ RangeQuery/BPlusTree/src/main/java/ds/bplus/**mdpf/**
 	rangeSearch(1,3);
 	rangeSearch(6,7);
 	rangeSearch(9,11);
-	rangeSearch(15);
+	rangeSearch(15,15);
 	
 
 
