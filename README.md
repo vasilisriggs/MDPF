@@ -521,6 +521,8 @@ RangeQuery/BPlusTree/src/main/java/ds/bplus/**mdpf/**
 	x1x2x3 = 011 --> 3
 	y1y2y3 = 000 --> 0 
 	
+	long[0] = 1
+	long[1] = 2
 	
 			
 		
