@@ -150,7 +150,7 @@ RangeQuery/BPlusTree/src/main/java/ds/bplus/**mdpf/**
 
 Τα αρχεία του φάκελου αυτού επρόκειτω για δική μου υλοποίηση. Πιο συγκεκριμένα:
 
-*	# **DataFile.java**: 
+# **DataFile.java**: 
 
 Η κλάση **DataFile** παίρνει ως όρισμα τον αριθμό των στοιχείων και δημιουργεί ένα αρχείο **raw.txt**.
 Ένα αρχείο **raw.txt** περιέχει μια κεφαλίδα:
@@ -188,7 +188,7 @@ RangeQuery/BPlusTree/src/main/java/ds/bplus/**mdpf/**
 		RangeQuery/multi/raw/100K_5.txt
 	
 
-*	**ResultFile.java**: 
+# **ResultFile.java**: 
 
 Η κλάση **ResultFile** παίρνει ως όρισμα ένα **DataFile instance object** καθώς και έναν ακέραιο αριθμό **pages** που ορίζει σε πόσα "κομμάτια" θα χωριστεί η κάθε διάσταση προκειμένου να δημιουργηθούν τα χωρία στον (δισ)διάστατο χώρο.
 
@@ -228,7 +228,7 @@ RangeQuery/BPlusTree/src/main/java/ds/bplus/**mdpf/**
 		RangeQuery/multi/results/100K_5_8_res.txt
 			
 		
-*	**TreeFile.java**:
+# **TreeFile.java**:
 
 Η κλάση **TreeFile** παίρνει ως όρισμα ένα **ResultFile instance object** καθώς και ένα σετ μεταβλητών (ακέραιοι) που αρχικοποιούν ένα δέντρο B+ Tree.
 
