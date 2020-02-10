@@ -230,7 +230,7 @@ RangeQuery/BPlusTree/src/main/java/ds/bplus/**mdpf/**
 		
 *	**TreeFile.java**:
 
-Η κλάση **TreeFile** παίρνει ως όρισμα ένα **ResultFile instance object** καθώς και ένα σετ μεταβλητών ( ακέραιοι ) που αρχικοποιούν ένα δέντρο B+ Tree.
+Η κλάση **TreeFile** παίρνει ως όρισμα ένα **ResultFile instance object** καθώς και ένα σετ μεταβλητών (ακέραιοι) που αρχικοποιούν ένα δέντρο B+ Tree.
 
 Ο **constructor** της κλάσης είναι (απλοποιημένη μορφή):
 
@@ -444,7 +444,7 @@ RangeQuery/BPlusTree/src/main/java/ds/bplus/**mdpf/**
 και έπειτα αφού το βρω 
 
 	capacity = sr.getLeaf().getCurrentCapacity();
-βρίσκω την χωρητικότητα του φύλλου που βρίσκεται το συγκεκριμένο κλειδί. Για να αποθηκεύσω το εύρος των indices στο αρχείο, έχω και μία μεταβλητή που καθορίζει το άνω φράγμα στο εύρος ( για αποθήκευση στο αρχείο ).
+βρίσκω την χωρητικότητα του φύλλου που βρίσκεται το συγκεκριμένο κλειδί. Για να αποθηκεύσω το εύρος των indices στο αρχείο, έχω και μία μεταβλητή που καθορίζει το άνω φράγμα στο εύρος (για αποθήκευση στο αρχείο).
 
 Με την έννοια χωρητικότητα, σε αυτό το σημείο, εννοώ τον αριθμό των indices που βρίσκονται εντός φύλλου.
 	
@@ -459,7 +459,7 @@ RangeQuery/BPlusTree/src/main/java/ds/bplus/**mdpf/**
 
 * **private ArrayList<**Long**>** **resultQuery(double[] lb, double[] ub, String curve)**
 
-Η μέθοδος **resultQuery()** παίρνει ως όρισμα δύο πίνακες και ένα αλφαριθμητικό που ορίζει τη μέθοδο indexing ( C και Z ) και επιστρέφει μία λίστα **ArrayList<**Long**>** η οποία περιέχει όλα τα indices των χωρίων που καλύπτονται από το "τετράγωνο" που δημιουργείται από τους πίνακες **lb** και **ub**.
+Η μέθοδος **resultQuery()** παίρνει ως όρισμα δύο πίνακες και ένα αλφαριθμητικό που ορίζει τη μέθοδο indexing (C και Z) και επιστρέφει μία λίστα **ArrayList<**Long**>** η οποία περιέχει όλα τα indices των χωρίων που καλύπτονται από το "τετράγωνο" που δημιουργείται από τους πίνακες **lb** και **ub**.
 
 	minIndex = findIndex(lb,curve);
 	maxIndex = findIndex(ub,curve);
@@ -471,7 +471,7 @@ RangeQuery/BPlusTree/src/main/java/ds/bplus/**mdpf/**
 	ub[0] // maxX
 	ub[1] // maxY
 	
-για μία συγκεκριμένη μέθοδο indexing. ( C ή Z ).
+για μία συγκεκριμένη μέθοδο indexing. (C ή Z).
 
 Ο κώδικας της **resultQuery** συνεχίζεται ως εξής:
 
@@ -524,7 +524,7 @@ RangeQuery/BPlusTree/src/main/java/ds/bplus/**mdpf/**
 	long[0] = 1
 	long[1] = 2
 				
-Έπειτα, η μέθοδος διασχίζει το δισδιάστατο χώρο και εισάγει τα indices που συναντεί στη λίστα που επιστρέφει.
+Έπειτα, η μέθοδος διασχίζει το δισδιάστατο χώρο και εισάγει τα **indices** που συναντεί στη λίστα που επιστρέφει.
 	
 	for i <- MINx1x2x3 to MAXx1x2x3  
 		for j <- MINy1y2y3 to MAXy1y2y3
@@ -548,7 +548,7 @@ RangeQuery/BPlusTree/src/main/java/ds/bplus/**mdpf/**
 				rrZ.getQueryResult().size(),falsePosC, falsePosZ, leafReadsC, leafReadsZ);
 **συνολικούς χρόνους εκτέλεσης**, **αριθμός (έγκυρων) αποτελεσμάτων**, **false positives**, και τον **αριθμό των φύλλων που διαβάστηκαν** (και για δέντρα C και Z).
 
-Όπως και σε κάθε μέθοδο **Query()**, αρχικά χρησιμοποιώ την **resultQuery()** για μου επιστρέψει σε μια λίστα όλα εκείνα τα **indices** στα οποία "ακουμπάει" το σετ δεδομένων των **lb** και **ub**  
+Όπως και σε κάθε μέθοδο **Query()**, αρχικά χρησιμοποιώ την **resultQuery()** για να μου επιστρέψει σε μια λίστα όλα εκείνα τα **indices** στα οποία "ακουμπάει" το σετ δεδομένων των **lb** και **ub**  
 
 	ArrayList<Long> longListC = resultQuery(lb,ub,"C");
 	ArrayList<Long> longListZ = resultQuery(lb,ub,"Z");
@@ -609,6 +609,9 @@ RangeQuery/BPlusTree/src/main/java/ds/bplus/**mdpf/**
 		if (list.get(i)<min) OR (list.get(i)-max > 1)
 			rr = bp.rangeSearch(min,max);
 			refineQuery(rr);
+			......
+			min <- list.get(i);
+			max <- list.get(i); 
 			......
 		end if
 		max <- list.get(i);
