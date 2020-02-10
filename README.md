@@ -501,7 +501,7 @@ RangeQuery/BPlusTree/src/main/java/ds/bplus/**mdpf/**
 
 **Reverse Concatenation**:
 	
-	index = 10 --> Binary --> 001010 ( 6 bits representation )
+	index = 10 --> Binary --> 001010 (6 bits representation)
 	001010 ---> x1x2x3y1y2y3 
 	
 	x1x2x3 = 001 --> 1
@@ -512,7 +512,7 @@ RangeQuery/BPlusTree/src/main/java/ds/bplus/**mdpf/**
 	
 **Reverse Interleaving**:
 	
-	index = 10 --> Binary --> 001010 ( 6 bits representation )
+	index = 10 --> Binary --> 001010 (6 bits representation)
 	001010 ---> x1y1x2y2x3y3 
 	
 	x1 = 0, x2 = 1, x3 = 1.
@@ -523,34 +523,60 @@ RangeQuery/BPlusTree/src/main/java/ds/bplus/**mdpf/**
 	
 	long[0] = 1
 	long[1] = 2
+				
+Έπειτα, η μέθοδος διασχίζει το δισδιάστατο χώρο και εισάγει τα indices που συναντεί στη λίστα που επιστρέφει.
 	
-			
-		
-		
-		
-		
-		
-	
-	
+	for i <- MINx1x2x3 to MAXx1x2x3  
+		for j <- MINy1y2y3 to MAXy1y2y3
+			indexOfTwoDimCoordinates <- IndexingMethod(i,j);
+			list.add(indexOfTwoDimCoordinates);
+		end for
+	end for
+Τέλος επιστρέφει την λίστα.
+
+	return longlist;
+				
 * **public QueryComponentsObject rangeQuery(double[] lb, double[] ub)**
 
 Η μέθοδος αυτή παίρνει ως όρισμα δύο δισδιάστατους πίνακες ( αφού είμαστε στις δύο διαστάσεις )
 	
-	double[] lb 	// lowerBound array containing minimum real values ( not indices )
-	double[] ub	// upperBound array containing maximum real values ( not indices )
+	double[] lb 	// lowerBound array containing minimum real values (not indices)
+	double[] ub	// upperBound array containing maximum real values (not indices)
 και επιστρέφει ένα αντικείμενο αποθήκευσης **QueryComponentsObject** στο οποίο αποθηκεύω:
 	
 	QueryComponentsObject qco  = new QueryComponentsObject(totalC,totalZ,rrC.getQueryResult().size(),
 				rrZ.getQueryResult().size(),falsePosC, falsePosZ, leafReadsC, leafReadsZ);
-συνολικούς χρόνους εκτέλεσης, αριθμός (έγκυρων) αποτελεσμάτων, false positives, και τον αριθμό των φύλλων που διαβάστηκαν ( και για δέντρα C και Z).
+**συνολικούς χρόνους εκτέλεσης**, **αριθμός (έγκυρων) αποτελεσμάτων**, **false positives**, και τον **αριθμό των φύλλων που διαβάστηκαν** (και για δέντρα C και Z).
 
-Όπως και σε κάθε μέθοδο **Query()**, αρχικά χρησιμοποιώ την **resultQuery** για μου επιστρέψει σε μια λίστα όλα εκείνα τα **indices** στα οποία "ακουμπάει" το σετ δεδομένων των **lb** και **ub**  
+Όπως και σε κάθε μέθοδο **Query()**, αρχικά χρησιμοποιώ την **resultQuery()** για μου επιστρέψει σε μια λίστα όλα εκείνα τα **indices** στα οποία "ακουμπάει" το σετ δεδομένων των **lb** και **ub**  
 
 	ArrayList<Long> longListC = resultQuery(lb,ub,"C");
 	ArrayList<Long> longListZ = resultQuery(lb,ub,"Z");
 
-Για την rangeQuery() δεν χρησιμοποιώ το δέντρο οπότε έχουμε:
+Έπειτα, βρίσκω το ελάχιστο(**min**) και το μέγιστο(**max**) index της κάθε λίστας και χρησιμοποιώ την **rangeSearch()** στο εύρος **[min, max]**.
 
+	long minIndex = getMinIndexFromList(longListC);
+	long maxIndex = getMaxIndexFromList(longListC);
+	RangeResult rrC = bpc.rangeSearch(minIndex, maxIndex, nonDupes);	
+	
+Αφαιρώ όλα τα στοιχεία τα οποία **ενώ** έχουν κλειδιά εντός του εύρους **[minIndex, maxIndex]**, έχουν τιμές **εκτός των οριών** **lb[]** και **ub[]**. Αυτό πραγματοποείται με τη μέθοδο **refineQuery()** η οποία παίρνει σαν όρισμα τους πίνακες **lb[]** και **ub[]** καθώς και το αντικείμενο **RangeResult** που περιέχει τα αποτελέσματα του **rangeSearch()**. Διαγράφει τα ανεπιθύμητα αποτελέσματα.
+
+Τέλος,
+
+	rangeIOres = bpc.getPerformanceClass().rangeIO(minIndex, maxIndex, nonDupes, false);
+	leafReadsC = rangeIOres[4]; // getInterminentLeafPageReads();
+	
+βρίσκω πόσα φύλλα διαβάστηκαν για το query στο εύρος [minIndex, maxIndex].
+
+Παράδειγμα:
+	
+	list: [5,1,3,7,9,11,15] //indices
+	min = 1
+	max = 15
+	
+	rangeSearch(1,15) --> (1,2,3,4,5,6,7,8,9,10,11,12,13,14,15)
+	false positives = 2,4,6,8,10,,12,13,14	//τουλάχιστον διότι για τα σωστά indices 
+						// κάποια στοιχεία μπορεί να είναι εκτός εύρους
 	
 
 
@@ -577,6 +603,6 @@ RangeQuery/BPlusTree/src/main/java/ds/bplus/**mdpf/**
 	* **Key-Value-InsertionTime-100K_x_pages[i]_res_pageSize[i]-8-24_C(ή Z).bin**: Μετράει το χρόνο της κάθε εισαγωγής στο δέντρο.
 	* **TreeBlockNumber-100K-pages[i]-pageSize[i]-System.currentTimeMillis().txt**: Για όλα τα διαφορετικά αρχεία, για το 			συγκεκριμένο συνδυασμό pages και blockSize εμφανίζει το σύνολο των blocks σύμφωνα με το **getTreeConfiguration().getPageSize()**
 	πάνω σε ένα δέντρο. Υπολογίζει και για το C και για το Z.
-	* **LeafElements-100K_x_pages[i]_res_blockSize[i]-8-24_C(ή Ζ).txt**:
+	* **LeafElements-100K_x_pages[i]_res_blockSize[i]-8-24_C(ή Ζ).txt**: Επιστρέφει, για κάθε ξεχωριστό αρχείο δέντρου (C και Z), 		τον αριθμό των indices σε κάθε φύλλο, το εύρος αυτών των indices για το σύνολο των indices που βρίσκονται στο εκάστοτε δέντρο.
 	* **TreeConstructionTime-100K-pages[i]-pageSize[i]-System.currentTimeMillis().txt** : Για όλα τα 5 διαφορετικά αρχεία, για το 		συγκεκριμένο συνδυασμό **pages** και **blockSize** εμφανίζει τον συνολικό χρόνο για τη δημιουργία των αρχείων δέντρου .bin για C 	 και Z.
 	
