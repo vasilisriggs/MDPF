@@ -584,8 +584,51 @@ RangeQuery/BPlusTree/src/main/java/ds/bplus/**mdpf/**
 	
 
 * **public QueryComponentsObject fractionsQuery(double[] lb, double[] ub)**
+
+Η μέθοδος αυτή δουλεύει με παρόμοιο τρόπο με την **rangeQuery()**. Η μόνη διαφορά είναι ψάχνει ένα ένα τα indices στην λίστα και για κάθε από αυτά επαναλαμβάνει τις 
+	
+	RangeResult rrC = bpc.rangeSearch(list.get(i));
+	refineQuery(rrC);
+για το συνολικό πλήθος indices στη λίστα **list**. Επιστρέφει και αυτή ένα αντικείμενο **QueryComponentObject**.
+Παράδειγμα:
+
+	list: [5,1,3,7,9,11,15] //indices
+	for i<-0 to list.size()
+		rangeSearch(list.get(i));
+	end for
+
 * **public QueryComponentsObject rangeFractionsQuery(double[] lb, double[] ub)**
 
+Η μέθοδος δουλεύει όπως οι προηγούμενες δύο (και επιστρέφει το ίδιο αντικείμενο). Όμως, αντίθετα με τις προηγούμενες, προσπαθεί να βρει εύρη συνεχόμενων indices για την **rangeSearch()**. 
+
+	
+	RangeResult rr;
+	int min <- list.get(0) //first index
+	int max <- list.get(0) //first index
+	for i<-1 to list.size()
+		if (list.get(i)<min) OR (list.get(i)-max > 1)
+			rr = bp.rangeSearch(min,max);
+			refineQuery(rr);
+			......
+		end if
+		max <- list.get(i);
+	end for
+	rr  = bp.rangeSearch(min,max);
+	refineQuery(rr);
+	
+	return;
+	
+Για μία λίστα όπως η παρακάτω, αυτός ο αλγόριθμος θα παράξει τα εξής:
+	
+	list: [5,4,1,2,3,6,7,9,10,11,15] // example list.
+	
+	rangeSearch(5,5);
+	rangeSearch(4,4);
+	rangeSearch(1,3);
+	rangeSearch(6,7);
+	rangeSearch(9,11);
+	rangeSearch(15);
+	
 
 
 ----------------------------------------------------------------------------------------------------------------------------
