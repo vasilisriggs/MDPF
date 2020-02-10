@@ -217,15 +217,15 @@ RangeQuery/BPlusTree/src/main/java/ds/bplus/**mdpf/**
 	
 Το αρχείο **result**:
 
-		RangeQuery/multi/results/100K_8.txt
+		RangeQuery/multi/results/100K_8_res.txt
 
 και για πολλαπλά αρχεία
 
-		RangeQuery/multi/results/100K_1_8.txt
-		RangeQuery/multi/results/100K_2_8.txt
-		RangeQuery/multi/results/100K_3_8.txt
-		RangeQuery/multi/results/100K_4_8.txt
-		RangeQuery/multi/results/100K_5_8.txt
+		RangeQuery/multi/results/100K_1_8_res.txt
+		RangeQuery/multi/results/100K_2_8_res.txt
+		RangeQuery/multi/results/100K_3_8_res.txt
+		RangeQuery/multi/results/100K_4_8_res.txt
+		RangeQuery/multi/results/100K_5_8_res.txt
 			
 		
 *	**TreeFile.java**:
