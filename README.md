@@ -434,7 +434,7 @@ RangeQuery/BPlusTree/src/main/java/ds/bplus/**mdpf/**
 	LeafElements-100K_1_256_res_1024-8-24_C.txt
 	και
 	LeafElements-100K_1_256_res_1024-8-24_Z.txt
-που περιέχουν τον αριθμό και το εύρος των **indices** που βρίσκοντα σε κάθε **Κόμβο Τύπου Φύλλου**.
+που περιέχουν τον αριθμό και το εύρος των **indices** που βρίσκοντα σε κάθε φύλλο.
 
 Η μέθοδος ξεκινά από το πρώτο κλειδί (0) και τελειώνει στο τελευταίο ( (page^2)-1 ).
 Αρχικά ψάχνω για το κλειδί **lower**
@@ -444,7 +444,9 @@ RangeQuery/BPlusTree/src/main/java/ds/bplus/**mdpf/**
 και έπειτα αφού το βρω 
 
 	capacity = sr.getLeaf().getCurrentCapacity();
-βρίσκω την χωρητικότητα του φύλλου που βρίσκεται το συγκεκριμένο κλειδί. Για να αποθηκεύσω το εύρος των indices στο αρχείο, έχω και μία μεταβλητή που καθορίζει το άνω φράγμα στο εύρος ( για αποθήκευση στο αρχείο )
+βρίσκω την χωρητικότητα του φύλλου που βρίσκεται το συγκεκριμένο κλειδί. Για να αποθηκεύσω το εύρος των indices στο αρχείο, έχω και μία μεταβλητή που καθορίζει το άνω φράγμα στο εύρος ( για αποθήκευση στο αρχείο ).
+
+Με την έννοια χωρητικότητα, σε αυτό το σημείο, εννοώ τον αριθμό των indices που βρίσκονται εντός φύλλου.
 	
 	upper = lower+capacity-1;
 Τέλος, 
@@ -455,13 +457,100 @@ RangeQuery/BPlusTree/src/main/java/ds/bplus/**mdpf/**
 
 
 
+* **private ArrayList<**Long**>** **resultQuery(double[] lb, double[] ub, String curve)**
 
+Η μέθοδος **resultQuery()** παίρνει ως όρισμα δύο πίνακες και ένα αλφαριθμητικό που ορίζει τη μέθοδο indexing ( C και Z ) και επιστρέφει μία λίστα **ArrayList<**Long**>** η οποία περιέχει όλα τα indices των χωρίων που καλύπτονται από το "τετράγωνο" που δημιουργείται από τους πίνακες **lb** και **ub**.
+
+	minIndex = findIndex(lb,curve);
+	maxIndex = findIndex(ub,curve);
+	
+Η findIndex βρίσκει και επιστρέφει το index το οποίο αντιστοιχεί για τα σημεία 
+	
+	lb[0] // minX
+	lb[1] // minY
+	ub[0] // maxX
+	ub[1] // maxY
+	
+για μία συγκεκριμένη μέθοδο indexing. ( C ή Z ).
+
+Ο κώδικας της **resultQuery** συνεχίζεται ως εξής:
+
+	minlong = revConcat(minIndex);	//minlong = revLeave(minIndex);
+	cnt = revConcat(minIndex);	//cnt = revLeave(minIndex);
+	maxlong = revConcat(maxIndex);	//maxlong = revLeave(maxIndex); 
+	for(int i=(int)minlong[0];i<=maxlong[0];i++) { // we add every index that is between 
+							( 2-dimensional ) the min and max.
+		for(int j=(int)minlong[1];j<=maxlong[1];j++) { // meaning that we parse the box to get every 
+								index(interleaved or concatenated)
+			longlist.add(findIndexLong(cnt,curve)); // that is inside the lowerBound and upperBound.
+			cnt[1]++;
+		}
+		cnt[1] = minlong[1];
+		cnt[0]++;
+	}
+
+Η συνάρτηση 
+
+	revConcat(index) // reverse concatenation 
+και 
+	
+	revLeave(index) // reverse interleaving
+	
+εφαρμόζουν αντίθετη μέθοδο indexing προκειμένου να σπάσουν το **index** στα αρχικά χωρία με σύνολο τιμών [0, pages-1] για κάθε διάσταση.
+Για παράδειγμα
+
+**Reverse Concatenation**:
+	
+	index = 10 --> Binary --> 001010 ( 6 bits representation )
+	001010 ---> x1x2x3y1y2y3 
+	
+	x1x2x3 = 001 --> 1
+	y1y2y3 = 010 --> 2
+	
+	long[0] = 1
+	long[1] = 2
+	
+**Reverse Interleaving**:
+	
+	index = 10 --> Binary --> 001010 ( 6 bits representation )
+	001010 ---> x1y1x2y2x3y3 
+	
+	x1 = 0, x2 = 1, x3 = 1.
+	y1 = 0, y2 = 0, y3 = 0
+	
+	x1x2x3 = 011 --> 3
+	y1y2y3 = 000 --> 0 
+	
+	
+			
+		
+		
+		
+		
+		
+	
+	
 * **public QueryComponentsObject rangeQuery(double[] lb, double[] ub)**
 
 Η μέθοδος αυτή παίρνει ως όρισμα δύο δισδιάστατους πίνακες ( αφού είμαστε στις δύο διαστάσεις )
 	
 	double[] lb 	// lowerBound array containing minimum real values ( not indices )
 	double[] ub	// upperBound array containing maximum real values ( not indices )
+και επιστρέφει ένα αντικείμενο αποθήκευσης **QueryComponentsObject** στο οποίο αποθηκεύω:
+	
+	QueryComponentsObject qco  = new QueryComponentsObject(totalC,totalZ,rrC.getQueryResult().size(),
+				rrZ.getQueryResult().size(),falsePosC, falsePosZ, leafReadsC, leafReadsZ);
+συνολικούς χρόνους εκτέλεσης, αριθμός (έγκυρων) αποτελεσμάτων, false positives, και τον αριθμό των φύλλων που διαβάστηκαν ( και για δέντρα C και Z).
+
+Όπως και σε κάθε μέθοδο **Query()**, αρχικά χρησιμοποιώ την **resultQuery** για μου επιστρέψει σε μια λίστα όλα εκείνα τα **indices** στα οποία "ακουμπάει" το σετ δεδομένων των **lb** και **ub**  
+
+	ArrayList<Long> longListC = resultQuery(lb,ub,"C");
+	ArrayList<Long> longListZ = resultQuery(lb,ub,"Z");
+
+Για την rangeQuery() δεν χρησιμοποιώ το δέντρο οπότε έχουμε:
+
+	
+
 
 
 	
@@ -477,7 +566,7 @@ RangeQuery/BPlusTree/src/main/java/ds/bplus/**mdpf/**
 **Παραγωγή αρχείων:**
 
 * Κατανομή: 
-	* Ομοιόμορφη/Κανονική. (τυπική απόκλιση σ~0.05).
+	* Ομοιόμορφη/Κανονική. (τυπική απόκλιση σ~0.05).                  // 2-9-2020
 * Αριθμός Στοιχείων 100K ( 100 χιλιάδες )
 	* pageSize = [1024, 2048, 4096, 8192, 16384] (Bytes)
 	* pages = [256, 512, 1024, 2048, 4096]
