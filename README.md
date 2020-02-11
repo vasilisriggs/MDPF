@@ -181,11 +181,11 @@ RangeQuery/BPlusTree/src/main/java/ds/bplus/**mdpf/**
 
 Η κλάση χειρίζεται και την περίπτωση δημιουργίας πολλαπλών αρχείων **raw** ίδιου αριθμού στοιχείων.
 		
-		RangeQuery/multi/raw/100K_1.txt
-		RangeQuery/multi/raw/100K_2.txt
-		RangeQuery/multi/raw/100K_3.txt
-		RangeQuery/multi/raw/100K_4.txt
-		RangeQuery/multi/raw/100K_5.txt
+	RangeQuery/multi/raw/100K_1.txt
+	RangeQuery/multi/raw/100K_2.txt
+	RangeQuery/multi/raw/100K_3.txt
+	RangeQuery/multi/raw/100K_4.txt
+	RangeQuery/multi/raw/100K_5.txt
 	
 
 # **ResultFile.java**: 
@@ -194,11 +194,11 @@ RangeQuery/BPlusTree/src/main/java/ds/bplus/**mdpf/**
 
 Διαβάζει το αρχείο DataFile (που βρίσκεται στη μνήμη, σε κάποιο κατάλογο, είτε δίνοντας το όνομα του αρχείου raw, είτε δίνοντας το όρισμα του DataFile object.)
 
-		ResultFile rf = new ResultFile(new DataFile(100000), 8)
+	ResultFile rf = new ResultFile(new DataFile(100000), 8)
 		
-						ή
-						
-		ResultFile rf = new ResultFile("100K.txt", 8)
+					ή
+					
+	ResultFile rf = new ResultFile("100K.txt", 8)
 		
 Ο πρώτος τρόπος είναι πιο χρηστικός και προτιμότερος για πολλαπλά αρχεία.
 
@@ -217,16 +217,16 @@ RangeQuery/BPlusTree/src/main/java/ds/bplus/**mdpf/**
 	
 Το αρχείο **result**:
 
-		RangeQuery/multi/results/100K_8_res.txt
+	RangeQuery/multi/results/100K_8_res.txt
 
 και για πολλαπλά αρχεία
 
-		RangeQuery/multi/results/100K_1_8_res.txt
-		RangeQuery/multi/results/100K_2_8_res.txt
-		RangeQuery/multi/results/100K_3_8_res.txt
-		RangeQuery/multi/results/100K_4_8_res.txt
-		RangeQuery/multi/results/100K_5_8_res.txt
-			
+	RangeQuery/multi/results/100K_1_8_res.txt
+	RangeQuery/multi/results/100K_2_8_res.txt
+	RangeQuery/multi/results/100K_3_8_res.txt
+	RangeQuery/multi/results/100K_4_8_res.txt
+	RangeQuery/multi/results/100K_5_8_res.txt
+		
 		
 # **TreeFile.java**:
 
@@ -649,7 +649,7 @@ RangeQuery/BPlusTree/src/main/java/ds/bplus/**mdpf/**
 
 	TreeBlockNumber-numberOfElements-pages-pageSize-System.currentTimeMillis().txt
 	
-που αποθηκεύει το σύνολο των Blocks για όλα τα αρχεία της ίδιας εκτέλεσης (που δημιουργούνται από ένα ManageFile αντικείμενο). 
+που αποθηκεύει το σύνολο των Blocks για όλα τα αρχεία της ίδιας εκτέλεσης (που δημιουργούνται από ένα **ManageFile** αντικείμενο). 
 Για το σκοπό αυτό χρησιμοποιώ την μέθοδο 
 
 	getTotalTreePages();
@@ -690,5 +690,10 @@ RangeQuery/BPlusTree/src/main/java/ds/bplus/**mdpf/**
 	
 # TO-DOs
 
-* Να δημουργήσω αρχεία **DataFile** με διαφορετική τυπική απόκλιση και να τρέξω το πρόγραμμα για την **Παραγωγή αρχείων**.
+* Να δημουργήσω αρχεία **DataFile** που να παράγουν δεδομένα με διαφορετικές τυπικές αποκλίσεις.
+* Να βελτιώσω την μέθοδο **getElements()** για να δουλεύει σωστά και για την περίπτωση που δεν υπάρχει κάποιο index.
+* Να προσθέσω μεθόδους για:
+	* **Local Cohesion Cost**
+	* **Global Cohesion Cost**
+* Να δημιουργήσω μέθοδο για Query logging (αναλυτικά αποτελέσματα σε .txt αρχείο)
 	
