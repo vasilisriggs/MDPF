@@ -596,7 +596,6 @@ public class BPlusTree {
                     i = 0;
                 }
             }
-
         }
         // this is the case where both searches might fail to find something, but
         // we *might* have something between in the given range. To account for
@@ -607,13 +606,22 @@ public class BPlusTree {
         // will be stopped at the first key that is less than min and max values
         // given even if we did not find anything.
         else {
-            sMax = searchKey(maxKey, unique);
-            int i = sMax.getIndex();
+        	sMax = searchKey(maxKey, unique);
+        	int i=0;
+        	if(!sMax.isFound()) {
+        		i = sMax.getIndex()-1;
+        	}else {
+        		i = sMax.getIndex();
+        	}
+            System.out.println("maxKey is "+maxKey);
+            System.out.println("Index is "+i);
+            
             while(i >= 0 && sMax.getLeaf().getKeyAt(i) >= minKey) {
+            	
                 rangeQueryResult.getQueryResult().
                         add(new KeyValueWrapper(sMax.getLeaf().getKeyAt(i),
                                 sMax.getLeaf().getValueAt(i)));
-
+            	
                 // check if we have an overflow page
                 if(!unique && sMax.getLeaf().getOverflowPointerAt(i) != -1)
                     {parseOverflowPages(sMax.getLeaf(), i, rangeQueryResult);}

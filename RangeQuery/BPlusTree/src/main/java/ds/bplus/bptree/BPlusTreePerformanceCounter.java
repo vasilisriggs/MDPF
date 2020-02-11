@@ -546,7 +546,7 @@ public class BPlusTreePerformanceCounter {
         System.out.println("\tLeaf node splits: " + totalLeafSplits);
     }
 
-    void resetAllMetrics() {
+    public void resetAllMetrics() {
         totalPages = 0;
         totalInternalNodes = 0;
         totalLeaves = 0;
