@@ -396,7 +396,7 @@ RangeQuery/BPlusTree/src/main/java/ds/bplus/**mdpf/**
 
 
 
-*	**TreeMods.java**: 
+# **TreeMods.java**: 
 
 Η κλάση **TreeMods** διαχειρίζεται αντικείμενο **TreeFile**. Ο constructor της είναι:
 
@@ -579,10 +579,6 @@ RangeQuery/BPlusTree/src/main/java/ds/bplus/**mdpf/**
 						// κάποια στοιχεία μπορεί να είναι εκτός εύρους
 	
 
-
-
-	
-
 * **public QueryComponentsObject fractionsQuery(double[] lb, double[] ub)**
 
 Η μέθοδος αυτή δουλεύει με παρόμοιο τρόπο με την **rangeQuery()**. Η μόνη διαφορά είναι ψάχνει ένα ένα τα indices στην λίστα και για κάθε από αυτά επαναλαμβάνει τις 
@@ -631,8 +627,45 @@ RangeQuery/BPlusTree/src/main/java/ds/bplus/**mdpf/**
 	rangeSearch(6,7);
 	rangeSearch(9,11);
 	rangeSearch(15,15);
-	
 
+# Αρχεία
+
+Για δεδομένα:
+* pageSize 
+* keySize
+* entrySize
+* pages
+* numberOfElements
+
+Παράγονται τα ακόλουθα αρχεία:
+
+1)
+
+	Key-Value-InsertionTime-numberOfElements_x_pages_res_pageSize-keySize-entrySize_C.txt
+	Key-Value-InsertionTime-numberOfElements_x_pages_res_pageSize-keySize-entrySize_Z.txt
+που αποθηκεύει το χρόνο κάθε εισαγωγής στο αντίστοιχο αρχείο δέντρου.
+
+2) 
+
+	TreeBlockNumber-numberOfElements-pages-pageSize-System.currentTimeMillis().txt
+	
+που αποθηκεύει το σύνολο των Blocks για όλα τα αρχεία της ίδιας εκτέλεσης (που δημιουργούνται από ένα ManageFile αντικείμενο). 
+Για το σκοπό αυτό χρησιμοποιώ την μέθοδο 
+
+	getTotalTreePages();
+πάνω στο αντικείμενο δέντρου που αντιστοιχεί στο συγκεκριμένο αρχείο.
+
+3) 
+
+	LeafElements-numberOfElements_x_pages_res_pageSize-keySize-entrySize_C.txt
+	LeafElements-numberOfElements_x_pages_res_pageSize-keySize-entrySize_Z.txt
+που αποθηκεύει τον αριθμό και το εύρος των indices που βρίσκονται σε κάθε φύλλο.
+
+4) 
+
+	TreeConstructionTime-numberOfElements-pages-pageSize-System.currentTimeInMillis().txt
+που αποθηκεύει για το σύνολο των αρχείων της ίδιας εκτέλεσης, τον συνολικό χρόνο για την παραγωγή του αρχείου δέντρου.
+		
 
 ----------------------------------------------------------------------------------------------------------------------------
 # Updates and Implementations
@@ -646,9 +679,9 @@ RangeQuery/BPlusTree/src/main/java/ds/bplus/**mdpf/**
 	* pages = [256, 512, 1024, 2048, 4096]
 	* 5 ξεχωριστά αρχεία για κάθε συνδυασμό
 * Για κάθε ένα από τα αρχεία αυτά:
-	* **Key-Value-InsertionTime-100K_x_pages[i]_res_pageSize[i]-8-24_C(ή Z).bin**: Μετράει το χρόνο της κάθε εισαγωγής στο δέντρο.
+	* **Key-Value-InsertionTime-100K_x_pages[i]_res_pageSize[i]-8-24_C(ή Z).txt**: Μετράει το χρόνο της κάθε εισαγωγής στο δέντρο.
 	* **TreeBlockNumber-100K-pages[i]-pageSize[i]-System.currentTimeMillis().txt**: Για όλα τα διαφορετικά αρχεία, για το 			συγκεκριμένο συνδυασμό pages και blockSize εμφανίζει το σύνολο των blocks σύμφωνα με το **getTreeConfiguration().getPageSize()**
 	πάνω σε ένα δέντρο. Υπολογίζει και για το C και για το Z.
-	* **LeafElements-100K_x_pages[i]_res_blockSize[i]-8-24_C(ή Ζ).txt**: Επιστρέφει, για κάθε ξεχωριστό αρχείο δέντρου (C και Z), 		τον αριθμό των indices σε κάθε φύλλο, το εύρος αυτών των indices για το σύνολο των indices που βρίσκονται στο εκάστοτε δέντρο.
+	* **LeafElements-100K_x_pages[i]_res_pageSize[i]-8-24_C(ή Ζ).txt**: Επιστρέφει, για κάθε ξεχωριστό αρχείο δέντρου (C και Z), 		τον αριθμό των indices σε κάθε φύλλο, το εύρος αυτών των indices για το σύνολο των indices που βρίσκονται στο εκάστοτε δέντρο.
 	* **TreeConstructionTime-100K-pages[i]-pageSize[i]-System.currentTimeMillis().txt** : Για όλα τα 5 διαφορετικά αρχεία, για το 		συγκεκριμένο συνδυασμό **pages** και **blockSize** εμφανίζει τον συνολικό χρόνο για τη δημιουργία των αρχείων δέντρου .bin για C 	 και Z.
 	
