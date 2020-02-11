@@ -679,9 +679,16 @@ RangeQuery/BPlusTree/src/main/java/ds/bplus/**mdpf/**
 	* pages = [256, 512, 1024, 2048, 4096]
 	* 5 ξεχωριστά αρχεία για κάθε συνδυασμό
 * Για κάθε ένα από τα αρχεία αυτά:
-	* **Key-Value-InsertionTime-100K_x_pages[i]_res_pageSize[i]-8-24_C(ή Z).txt**: Μετράει το χρόνο της κάθε εισαγωγής στο δέντρο.
-	* **TreeBlockNumber-100K-pages[i]-pageSize[i]-System.currentTimeMillis().txt**: Για όλα τα διαφορετικά αρχεία, για το 			συγκεκριμένο συνδυασμό pages και blockSize εμφανίζει το σύνολο των blocks σύμφωνα με το **getTreeConfiguration().getPageSize()**
-	πάνω σε ένα δέντρο. Υπολογίζει και για το C και για το Z.
-	* **LeafElements-100K_x_pages[i]_res_pageSize[i]-8-24_C(ή Ζ).txt**: Επιστρέφει, για κάθε ξεχωριστό αρχείο δέντρου (C και Z), 		τον αριθμό των indices σε κάθε φύλλο, το εύρος αυτών των indices για το σύνολο των indices που βρίσκονται στο εκάστοτε δέντρο.
-	* **TreeConstructionTime-100K-pages[i]-pageSize[i]-System.currentTimeMillis().txt** : Για όλα τα 5 διαφορετικά αρχεία, για το 		συγκεκριμένο συνδυασμό **pages** και **blockSize** εμφανίζει τον συνολικό χρόνο για τη δημιουργία των αρχείων δέντρου .bin για C 	 και Z.
+	* **Key-Value-InsertionTime-100K_x_pages[i]_res_pageSize[i]-8-24_C(ή Z).txt**
+	* **TreeBlockNumber-100K-pages[i]-pageSize[i]-System.currentTimeMillis().txt**
+	* **LeafElements-100K_x_pages[i]_res_pageSize[i]-8-24_C(ή Ζ).txt**
+	* **TreeConstructionTime-100K-pages[i]-pageSize[i]-System.currentTimeMillis().txt**
+	
+	
+	
+	
+	
+# TO-DOs
+
+* Να δημουργήσω αρχεία **DataFile** με διαφορετική τυπική απόκλιση και να τρέξω το πρόγραμμα για την **Παραγωγή αρχείων**.
 	
