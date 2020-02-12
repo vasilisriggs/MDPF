@@ -28,6 +28,7 @@ public class ResultFile{
 			System.out.println("ResultFile file: "+filename+" already exists. Closing.");
 			return;
 		}
+		
 		BufferedWriter writer = new BufferedWriter(new FileWriter(writeFile, true));
 
 		int rbits = getBits(pages);
@@ -191,8 +192,6 @@ public class ResultFile{
 		// read file header from file
 		r = Integer.parseInt(datas1[0]);
 		n = Integer.parseInt(datas1[1]);
-
-		
 		
 		// arrays initialization
 		min = new double[n];
@@ -272,7 +271,6 @@ public class ResultFile{
 					indexing[i] = (int)(Math.ceil(tempd)-1);
 				}
 			} 
-
 			// binary representation. rbits = 3 (for 8 pages, so i'll zero pad numbers that have less than 3 bits; 1->001, 11->011, etc.)
 			for(int i=0;i<indexing.length;i++){
 				b = Integer.toBinaryString(indexing[i]);
@@ -281,7 +279,6 @@ public class ResultFile{
 				}
 				bins[i] = b.toString().trim();
 			}
-
 			// interleaving.
 			for(int i=0;i<bins.length;i++){
 				binholder = bins[i].split("(?!^)");
@@ -296,7 +293,6 @@ public class ResultFile{
 				}
 			}
 			z = b;
-			
 			//concatenate.
 			b="";
 			for(int i=0;i<bins.length;i++){

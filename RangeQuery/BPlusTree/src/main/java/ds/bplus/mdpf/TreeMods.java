@@ -67,7 +67,6 @@ public class TreeMods{
 	/**
 	 * Calculates the time that rangeSearch function iterates through the four quarters of the B+ Tree indexes.
 	 * 
-	 * 
 	 * @param iterations iterations indicates how many times the program will iterate over the time calculations.
 	 * @return an TimeQuarter object that holds reference to the performance times of the rangeSearch function for both C and Z bin files.
 	 * @throws IOException
@@ -184,9 +183,9 @@ public class TreeMods{
 		String[] line = filenameC.split("_");
 		String prefix = "LeafElements";
 		// multi file
-		// String filefix = line[1]+"_"+line[2]+"_"+line[4]+"_"+line[5];
+		String filefix = line[1]+"_"+line[2]+"_"+line[3]+"_"+line[4]+"_"+line[5];
 		// single file
-		String filefix = line[1]+"_"+line[2]+"_"+line[4];
+		//String filefix = line[1]+"_"+line[2]+"_"+line[4];
 		String filenames = prefix+"-"+filefix;
 		
 		String writeFileC = stDirectory+"/"+filenames+"_C.txt";
@@ -210,46 +209,71 @@ public class TreeMods{
 		String chars = "";
 		int maxChars = 3;
 		int capacity = 0;
+		TreeLeaf leaf;
 		
 		writerC.append("Leaf-Index	NumberOfIndexes	Range");
 		
-		while(upper<maxIndex){
+		while(upper<maxIndex) {
 			writerC.newLine();
 			sr = bpc.searchKey(lower, true);
-			capacity = sr.getLeaf().getCurrentCapacity();
-			upper = lower+capacity-1;
+			while(!sr.isFound()) {
+				lower++; // go next index
+				sr = bpc.searchKey(lower, true);
+			}
+			leaf = sr.getLeaf();
+			capacity = leaf.getCurrentCapacity();
+			upper = lower+capacity-1; 
+			if(upper>=maxIndex) {
+				upper = maxIndex;
+				capacity = (int)(upper-lower+1);
+			}
+			while((leaf.equals(bpc.searchKey(upper+1, true).getLeaf()))&&(upper<maxIndex)) {
+				upper++;
+			}// if next index is on the same leaf, then the range increases by one.
+			
 			chars = String.valueOf(cnt);
 			while(chars.length()<maxChars) {
 				chars = "0"+chars;
 			}
+			
 			writerC.append(chars+" "+String.valueOf(capacity)+" "+String.valueOf(lower)+"-"+String.valueOf(upper));
 			
-			lower = upper+1;
-			cnt++;
+			lower = upper+1; // go next range
+			cnt++; 
 		}			
-		
 		writerC.close();
 		System.out.println(filenames+"_C.txt was created successfully.");
-		
 		BufferedWriter writerZ = new BufferedWriter(new FileWriter(writeFileZ, true));
 		writerZ.append("Leaf-Index	NumberOfIndexes	Range");
 		lower = 0;
 		upper = 0;
 		cnt = 1;
-		
 		while(upper<maxIndex) {
 			writerZ.newLine();
-			sr = bpz.searchKey(lower, true);
-			capacity = sr.getLeaf().getCurrentCapacity();
-			upper = lower+capacity-1;
+			sr = bpc.searchKey(lower, true);
+			while(!sr.isFound()) {
+				lower++; // go next index
+				sr = bpz.searchKey(lower, true);
+			}
+			leaf = sr.getLeaf();
+			capacity = leaf.getCurrentCapacity();
+			upper = lower+capacity-1; 
+			if(upper>=maxIndex) {
+				upper = maxIndex;
+				capacity = (int)(upper-lower+1);
+			}
+			while((leaf.equals(bpz.searchKey(upper+1, true).getLeaf()))&&(upper<maxIndex)) {
+				upper++;
+			}// if next index is on the same leaf, then the range increases by one.
+			
 			chars = String.valueOf(cnt);
 			while(chars.length()<maxChars) {
 				chars = "0"+chars;
 			}
-			writerZ.append(chars+" "+String.valueOf(capacity)+" "+String.valueOf(lower)+"-"+String.valueOf(upper));
 			
-			lower = upper+1;
-			cnt++;
+			writerZ.append(chars+" "+String.valueOf(capacity)+" "+String.valueOf(lower)+"-"+String.valueOf(upper));
+			lower = upper+1; // go next range
+			cnt++; 
 		}
 		writerZ.close();
 		System.out.println(filenames+"_Z.txt was created successfully.");
@@ -265,11 +289,16 @@ public class TreeMods{
 	 * @throws IOException 
 	 */
 	public QueryComponentsObject rangeQuery(double[] lb, double[] ub) throws IOException, InvalidBTreeStateException{
+		
 		ArrayList<Long> longListC = resultQuery(lb,ub,"C");
 		ArrayList<Long> longListZ = resultQuery(lb,ub,"Z");
 		
+		int leafReadsC = 0;
+		int leafReadsZ = 0;
 		int falsePosC = 0;
 		int falsePosZ = 0;
+		
+		int[] rangeIOres;
 		
 		boolean nonDupes = false;	
 		
@@ -278,38 +307,52 @@ public class TreeMods{
 		
 		long startC = System.currentTimeMillis();
 		RangeResult rrC = bpc.rangeSearch(minIndex, maxIndex, nonDupes); // using getMinIndexFromList() and --Max--() inside rangeSearch() will make it take more time.
-		falsePosC = falsePosC + rrC.getQueryResult().size();
+		falsePosC = rrC.getQueryResult().size();
 		refineQuery(lb,ub,rrC);
 		falsePosC = falsePosC - rrC.getQueryResult().size();
 		long endC = System.currentTimeMillis();
 		long totalC = endC - startC;
+		
+		bpc.getPerformanceClass().resetAllMetrics();
+		rangeIOres = bpc.getPerformanceClass().rangeIO(minIndex, maxIndex, nonDupes, false);
+		leafReadsC = rangeIOres[4]; // getInterminentLeafPageReads();
 		
 		minIndex = getMinIndexFromList(longListZ);
 		maxIndex = getMaxIndexFromList(longListZ);
 		
 		long startZ = System.currentTimeMillis();
 		RangeResult rrZ = bpz.rangeSearch(minIndex, maxIndex, nonDupes);
-		falsePosZ = falsePosZ + rrZ.getQueryResult().size();
+		falsePosZ = rrZ.getQueryResult().size();
 		refineQuery(lb,ub,rrZ);
 		falsePosZ = falsePosZ - rrZ.getQueryResult().size();
 		long endZ = System.currentTimeMillis();
 		long totalZ = endZ - startZ;
 		
-		QueryComponentsObject qco  = new QueryComponentsObject(totalC,totalZ,rrC.getQueryResult().size(),rrZ.getQueryResult().size(), falsePosC, falsePosZ);
+		bpz.getPerformanceClass().resetAllMetrics();
+		rangeIOres = bpz.getPerformanceClass().rangeIO(minIndex, maxIndex, nonDupes, false);
+		leafReadsZ = rangeIOres[4]; // getInterminentLeafPageReads();
+		
+		QueryComponentsObject qco  = new QueryComponentsObject(totalC,totalZ,rrC.getQueryResult().size(),rrZ.getQueryResult().size(), falsePosC, falsePosZ, leafReadsC, leafReadsZ);
+		bpc.getPerformanceClass().resetAllMetrics();
+		bpz.getPerformanceClass().resetAllMetrics();
 		
 		System.out.println(falsePosC);
 		System.out.println(falsePosZ);
+		
 		return qco;	
- 	}
-	
+ 	}	
 	public QueryComponentsObject fractionsQuery(double[] lb, double[] ub) throws IOException, InvalidBTreeStateException {
 		ArrayList<Long> longListC = resultQuery(lb,ub,"C");
 		ArrayList<Long> longListZ = resultQuery(lb,ub,"Z");
 		
 		boolean nonDupes = false;
 		
+		int leafReadsC = 0;
+		int leafReadsZ = 0;
 		int falsePosC = 0;
 		int falsePosZ = 0;
+		
+		int[] rangeIOres;
 		
 		int totalSizeC = 0;
 		int totalSizeZ = 0;
@@ -333,7 +376,13 @@ public class TreeMods{
 			endC = System.currentTimeMillis();
 			totalC = totalC + (endC-startC);
 			totalSizeC = totalSizeC + rrC.getQueryResult().size();
+			
+			rangeIOres = bpc.getPerformanceClass().rangeIO(longListC.get(i), longListC.get(i), nonDupes, false);
+			leafReadsC = leafReadsC + rangeIOres[4];
+			
+			bpc.getPerformanceClass().resetAllMetrics();
 		}
+		
 		
 		for(int i=0;i<longListZ.size();i++) {
 			startZ = System.currentTimeMillis();
@@ -344,22 +393,32 @@ public class TreeMods{
 			endZ = System.currentTimeMillis();
 			totalZ = totalZ + (endZ-startZ);
 			totalSizeZ = totalSizeZ + rrZ.getQueryResult().size();
+			
+			rangeIOres = bpz.getPerformanceClass().rangeIO(longListZ.get(i), longListZ.get(i), nonDupes, false);
+			leafReadsZ = leafReadsZ + rangeIOres[4];
+			
+			bpz.getPerformanceClass().resetAllMetrics();
 		}
 		
-		QueryComponentsObject tmo = new QueryComponentsObject(totalC,totalZ,totalSizeC,totalSizeZ,falsePosC,falsePosZ);
-		return tmo;
+		QueryComponentsObject qco = new QueryComponentsObject(totalC, totalZ, totalSizeC, totalSizeZ, falsePosC, falsePosZ, leafReadsC, leafReadsZ);
+		bpc.getPerformanceClass().resetAllMetrics();
+		bpz.getPerformanceClass().resetAllMetrics();
+		return qco;
 	}
 	
 	public QueryComponentsObject rangeFractionsQuery(double[] lb, double[] ub) throws IOException, InvalidBTreeStateException {
 		ArrayList<Long> longListC = resultQuery(lb,ub,"C");
 		ArrayList<Long> longListZ = resultQuery(lb,ub,"Z");
 		
+		
+		int leafReadsC = 0;
+		int leafReadsZ = 0;
 		int falsePosC = 0;
 		int falsePosZ = 0;
 		
 		boolean nonDupes = false;
 		
-		
+		int[] rangeIOres;
 		
 		long start;
 		long end;
@@ -373,9 +432,7 @@ public class TreeMods{
 		int totalSizeZ = 0;
 		
 		long min = 0;
-		long max = 0;
-		
-		
+		long max = 0;	
 		
 		min = longListC.get(0);
 		max = longListC.get(0);
@@ -387,21 +444,20 @@ public class TreeMods{
 			// The ranges are: [2], [4,5], [7], [10], [9], [11,12]
 			if((longListC.get(i)<min)||(longListC.get(i)-max>1)) {
 				start = System.currentTimeMillis();		
-				rrC = bpc.rangeSearch(min, max, nonDupes);
-						
+				rrC = bpc.rangeSearch(min, max, nonDupes);		
 				falsePosC = falsePosC + rrC.getQueryResult().size();
 				refineQuery(lb,ub,rrC);
 				falsePosC = falsePosC - rrC.getQueryResult().size();
 				end = System.currentTimeMillis();
 				totalC = totalC + (end-start);
 				totalSizeC = totalSizeC + rrC.getQueryResult().size();
-				
+				rangeIOres = bpc.getPerformanceClass().rangeIO(min, max, nonDupes, false);
+				leafReadsC = leafReadsC + rangeIOres[4];
 				min = longListC.get(i);
 				max = longListC.get(i);
 			}
 			max = longListC.get(i);
 		}
-		
 		start = System.currentTimeMillis();
 		rrC = bpc.rangeSearch(min, max, nonDupes);
 		falsePosC = falsePosC + rrC.getQueryResult().size();
@@ -410,13 +466,12 @@ public class TreeMods{
 		end = System.currentTimeMillis();
 		totalC = totalC + (end-start);
 		totalSizeC = totalSizeC + rrC.getQueryResult().size();
-		
+		rangeIOres = bpc.getPerformanceClass().rangeIO(min, max, nonDupes, false);
+		leafReadsC = leafReadsC + rangeIOres[4];
 		min = longListZ.get(0);
 		max = longListZ.get(0);
-		
 		for(int i=1;i<longListZ.size();i++) {
-			if((longListZ.get(i)<min)||(longListZ.get(i)-max>1)) {
-		
+			if((longListZ.get(i)<min)||(longListZ.get(i)-max>1)) {	
 				start = System.currentTimeMillis();
 				rrZ = bpz.rangeSearch(min, max, nonDupes);
 				falsePosZ = falsePosZ + rrZ.getQueryResult().size();
@@ -425,13 +480,13 @@ public class TreeMods{
 				end = System.currentTimeMillis();
 				totalZ = totalZ + (end-start);
 				totalSizeZ = totalSizeZ + rrZ.getQueryResult().size();
-				
+				rangeIOres = bpz.getPerformanceClass().rangeIO(min, max, nonDupes, false);
+				leafReadsZ = leafReadsZ + rangeIOres[4];
 				min = longListZ.get(i);
 				max = longListZ.get(i);		
 			}
 			max = longListZ.get(i);
 		}
-		
 		start = System.currentTimeMillis();
 		rrZ = bpz.rangeSearch(min, max, nonDupes);
 		falsePosZ = falsePosZ + rrZ.getQueryResult().size();
@@ -440,11 +495,10 @@ public class TreeMods{
 		end = System.currentTimeMillis();
 		totalZ = totalZ + (end-start);
 		totalSizeZ = totalSizeZ + rrZ.getQueryResult().size();
-		
-		QueryComponentsObject qco = new QueryComponentsObject(totalC,totalZ,totalSizeC,totalSizeZ,falsePosC,falsePosZ);
-		
-		return qco;
-		
+		rangeIOres = bpz.getPerformanceClass().rangeIO(min, max, nonDupes, false);
+		leafReadsZ = leafReadsZ + rangeIOres[4];
+		QueryComponentsObject qco = new QueryComponentsObject(totalC, totalZ, totalSizeC, totalSizeZ, falsePosC, falsePosZ, leafReadsC, leafReadsZ);
+		return qco;	
 	}
 	
 	private void refineQuery(double[] lb, double[] ub, RangeResult rr) {
@@ -473,7 +527,7 @@ public class TreeMods{
 			}
 		}
 	}
-	
+
 	private long getMinIndexFromList(ArrayList<Long> longlist){
 		long min = MAX_VALUE;
 		for(int i=0;i<longlist.size();i++) {
@@ -706,7 +760,6 @@ public class TreeMods{
 		}
 		return parts;
 	}
-	
 	private long interleave(String[] bins) { // interleaving
 		String b = "";
 		String[][] binswap = new String[rbits][2];
@@ -724,11 +777,8 @@ public class TreeMods{
 		}
 		return Long.parseLong(b,2);
 	}
-	
 	public TreeFile getTreeFile() 
 	{return tf;}
-	
-	
 	public TimeQuarters getTimeQuarters()
 	{return this.tqs;}
 }

@@ -99,10 +99,14 @@ public class TreeFile {
 		String writeTimeC = stDirectory+"/"+nodePrefix+"-"+splitFile[0]+"_"+String.valueOf(pageSize)+"-"+String.valueOf(keySize+"-"+String.valueOf(entrySize))+"_C.txt";
 		String writeTimeZ = stDirectory+"/"+nodePrefix+"-"+splitFile[0]+"_"+String.valueOf(pageSize)+"-"+String.valueOf(keySize+"-"+String.valueOf(entrySize))+"_Z.txt";
 		
-		BufferedWriter writerC = new BufferedWriter(new FileWriter(writeTimeC, true));
-		BufferedWriter writerZ = new BufferedWriter(new FileWriter(writeTimeZ, true));
+		//BufferedWriter writerC = new BufferedWriter(new FileWriter(writeTimeC, true));
+		//BufferedWriter writerZ = new BufferedWriter(new FileWriter(writeTimeZ, true));
 		
+		int cnt = 0;
 		while((line = br.readLine()) != null) {
+			
+			cnt++;
+			System.out.println(cnt);
 			datas = line.split(" ");
 			entry = datas[0]+","+datas[1];
 			
@@ -114,20 +118,20 @@ public class TreeFile {
 			end = System.currentTimeMillis();
 			timeC = timeC + (end-start);
 			
-			writerC.append(String.valueOf(end-start));
-			writerC.newLine();
+			//writerC.append(String.valueOf(end-start));
+			//writerC.newLine();
 			
 			start = System.currentTimeMillis();
 			bpz.insertKey(keyZ, entry, duplicates);
 			end = System.currentTimeMillis();
 			timeZ = timeZ + (end-start);
 			
-			writerZ.append(String.valueOf(end-start));
-			writerZ.newLine();
+			//writerZ.append(String.valueOf(end-start));
+			//writerZ.newLine();
 		}
 		
-		writerZ.close();
-		writerC.close();
+		//writerZ.close();
+		//writerC.close();
 		
 		bpc.commitTree();
 		bpz.commitTree();

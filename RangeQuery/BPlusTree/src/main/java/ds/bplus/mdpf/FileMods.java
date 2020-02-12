@@ -1,10 +1,9 @@
 package ds.bplus.mdpf;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.*;
 import java.lang.*;
+import java.math.BigDecimal;
+import java.text.DecimalFormat;
 
 
 public class FileMods {
@@ -17,7 +16,8 @@ public class FileMods {
 	private String statisticsDir = "statistics";
 	private String treeTimesFilename = "TreeConstructionRunningTime";
 	private String treeBlocksFilename = "TreeBlockNumber"; 
-	public FileMods() {}
+	private DecimalFormat decf  = new DecimalFormat("#.#");
+	public FileMods(){}
 	
 	/**
 	 * Stores the running time of the insertion of the elements in a B+ Tree in a text file. 
@@ -29,6 +29,8 @@ public class FileMods {
 	 * @param times is the tree construction time of a tree.
 	 * @throws IOException
 	 */
+	
+	
 	public void storeTreeTimes(String filefix, int pages, int pageSize, String[][] names, long[][] times) throws IOException {
 		String filename = treeTimesFilename+"-"+filefix+"-"+String.valueOf(pages)+"-"+String.valueOf(pageSize)+"-"+String.valueOf(System.currentTimeMillis())+".txt";
 		String writeFile = multipleDir+"/"+statisticsDir+"/"+filename;
@@ -72,6 +74,56 @@ public class FileMods {
 			}
 		}
 		writer.close();
-		return;
+		return;		
 	}
+	
+	
+	public void sampling(int sampleFrequency) throws IOException {
+		String dir = "multi/statistics";
+		String fileFix = "Key-Value-InsertionTime";
+		
+		String readFile = "";
+		String[] line;
+		String tempS = "";
+		
+		double bd;
+		
+		long total = 0;
+		int cnt = 0;
+		
+		BufferedReader br;
+		BufferedWriter writer;
+		String writeFile;
+		File folder = new File(dir);
+		File[] listOfFiles = folder.listFiles(); // array of relative pathnames.
+		
+		
+		// I want to proccess only Key-Value-InsertionTime files.
+		for(int i=0;i<listOfFiles.length;i++) {
+			readFile = listOfFiles[i].getName();
+			line = readFile.split("-");
+			tempS = line[0]+"-"+line[1]+"-"+line[2];
+			if(tempS.equals(fileFix)) {
+				System.out.println(listOfFiles[i]);
+				writeFile = dir+"/"+"Sampled-By-"+sampleFrequency+"-"+readFile;
+				br = new BufferedReader(new FileReader(listOfFiles[i]));
+				writer = new BufferedWriter(new FileWriter(writeFile, true));
+				
+				while((tempS = br.readLine()) != null) {
+					cnt++; // 1st line
+					total = total + Long.parseLong(tempS);
+					if(cnt==sampleFrequency) {
+						bd = Double.valueOf((double)((double)total/sampleFrequency));
+						writer.append(String.valueOf(bd));
+						writer.newLine();
+						total = 0;
+						cnt = 0;
+					}
+				}
+				writer.close();
+				br.close();
+			}
+		}	
+	}
+	
 }
