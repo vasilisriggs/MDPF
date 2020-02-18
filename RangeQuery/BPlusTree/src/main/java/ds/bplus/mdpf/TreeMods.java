@@ -216,18 +216,25 @@ public class TreeMods{
 		while(upper<maxIndex) {
 			writerC.newLine();
 			sr = bpc.searchKey(lower, true);
+			System.out.println("is it found?: "+sr.isFound());
 			while(!sr.isFound()) {
 				lower++; // go next index
 				sr = bpc.searchKey(lower, true);
 			}
+			System.out.println(lower+" is found on the tree.");
 			leaf = sr.getLeaf();
+			sr.getLeaf().printNode();
 			capacity = leaf.getCurrentCapacity();
+			System.out.println("capacity is: "+capacity);
 			upper = lower+capacity-1; 
+			System.out.println("upper is: "+upper);
 			if(upper>=maxIndex) {
 				upper = maxIndex;
 				capacity = (int)(upper-lower+1);
 			}
-			while((leaf.equals(bpc.searchKey(upper+1, true).getLeaf()))&&(upper<maxIndex)) {
+			while((leaf.equals(bpc.searchKey(upper+1, true).getLeaf()))&&(upper<maxIndex)){
+				System.out.println("next upper: "+upper+1+" is on the same leaf");
+				System.out.println();
 				upper++;
 			}// if next index is on the same leaf, then the range increases by one.
 			
