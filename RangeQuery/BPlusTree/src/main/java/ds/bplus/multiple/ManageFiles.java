@@ -34,6 +34,9 @@ public class ManageFiles{
 			}
 			df[i] = new DataFile(elements,fileSuffix);
 			rf[i] = new ResultFile(df[i],pages);
+			if(statFiles) {
+				sf[i] = new StatFile(rf[i]);  
+			}
 			tf[i] = new TreeFile(pageSize,keySize,entrySize, rf[i]);
 			tm[i] = new TreeMods(tf[i]);
 			
@@ -43,9 +46,7 @@ public class ManageFiles{
 			names[i][1] = tf[i].getFilenameZ();
 			blockNums[i][0] = tf[i].getBTreeC().getTotalTreePages();
 			blockNums[i][1] = tf[i].getBTreeZ().getTotalTreePages();
-			if(statFiles) {
-				sf[i] = new StatFile(rf[i]);  
-			}
+			
 			if(leafElements&&tf[0].binariesExisted()){
 				tm[i].getLeafElements();
 			}
