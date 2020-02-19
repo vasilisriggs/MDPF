@@ -212,8 +212,13 @@ public class DataFile{
 	    	maxs[1] = max_lat;
 	    	System.out.println("DataFile file: "+this.getDataFilePath()+" was created successfully.");
     	}
-
-    	public double getMaxLatitude()
+		
+		
+		
+		
+		
+		
+		public double getMaxLatitude()
     	{return max_lat;}
 
     	public double getMaxLongitude()
