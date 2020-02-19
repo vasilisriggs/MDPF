@@ -452,7 +452,7 @@ Aρχικά, βρίσκω το πρώτο index που υπάρχει στο δ�
 	}
 Βρίσκω το φύλλο στο οποίο βρίσκεται το **index**, 
 	
-	TreeLeaf leaf = sr.getLeaf();
+	leaf = sr.getLeaf();
 το τελευταίο κλειδί που υπάρχει στο φύλλο **leaf**,
 
 	upper = leaf.getLastKey();
