@@ -210,44 +210,31 @@ public class TreeMods{
 		int maxChars = 3;
 		int capacity = 0;
 		TreeLeaf leaf;
-		
 		writerC.append("Leaf-Index	NumberOfIndexes	Range");
-		
 		while(upper<maxIndex) {
 			writerC.newLine();
 			sr = bpc.searchKey(lower, true);
-			System.out.println("is it found?: "+sr.isFound());
 			while(!sr.isFound()) {
 				lower++; // go next index
+				if(lower>maxIndex) {
+					break;
+				}
 				sr = bpc.searchKey(lower, true);
 			}
-			System.out.println(lower+" is found on the tree.");
-			leaf = sr.getLeaf();
-			sr.getLeaf().printNode();
-			capacity = leaf.getCurrentCapacity();
-			System.out.println("capacity is: "+capacity);
-			upper = lower+capacity-1; 
-			System.out.println("upper is: "+upper);
-			if(upper>=maxIndex) {
-				upper = maxIndex;
-				capacity = (int)(upper-lower+1);
+			if(lower>maxIndex) {
+				break;
 			}
-			while((leaf.equals(bpc.searchKey(upper+1, true).getLeaf()))&&(upper<maxIndex)){
-				System.out.println("next upper: "+upper+1+" is on the same leaf");
-				System.out.println();
-				upper++;
-			}// if next index is on the same leaf, then the range increases by one.
-			
+			leaf = sr.getLeaf();
+			upper = leaf.getLastKey();
+			capacity = leaf.getCurrentCapacity();
 			chars = String.valueOf(cnt);
 			while(chars.length()<maxChars) {
 				chars = "0"+chars;
 			}
-			
 			writerC.append(chars+" "+String.valueOf(capacity)+" "+String.valueOf(lower)+"-"+String.valueOf(upper));
-			
 			lower = upper+1; // go next range
 			cnt++; 
-		}			
+		}
 		writerC.close();
 		System.out.println(filenames+"_C.txt was created successfully.");
 		BufferedWriter writerZ = new BufferedWriter(new FileWriter(writeFileZ, true));
@@ -257,27 +244,24 @@ public class TreeMods{
 		cnt = 1;
 		while(upper<maxIndex) {
 			writerZ.newLine();
-			sr = bpc.searchKey(lower, true);
+			sr = bpz.searchKey(lower, true);
 			while(!sr.isFound()) {
 				lower++; // go next index
+				if(lower>maxIndex) {
+					break;
+				}
 				sr = bpz.searchKey(lower, true);
 			}
-			leaf = sr.getLeaf();
-			capacity = leaf.getCurrentCapacity();
-			upper = lower+capacity-1; 
-			if(upper>=maxIndex) {
-				upper = maxIndex;
-				capacity = (int)(upper-lower+1);
+			if(lower>maxIndex) {
+				break;
 			}
-			while((leaf.equals(bpz.searchKey(upper+1, true).getLeaf()))&&(upper<maxIndex)) {
-				upper++;
-			}// if next index is on the same leaf, then the range increases by one.
-			
+			leaf = sr.getLeaf();
+			upper = leaf.getLastKey();
+			capacity = leaf.getCurrentCapacity();
 			chars = String.valueOf(cnt);
 			while(chars.length()<maxChars) {
 				chars = "0"+chars;
 			}
-			
 			writerZ.append(chars+" "+String.valueOf(capacity)+" "+String.valueOf(lower)+"-"+String.valueOf(upper));
 			lower = upper+1; // go next range
 			cnt++; 
