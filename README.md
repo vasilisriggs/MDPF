@@ -4,7 +4,7 @@
 Έχουμε ένα αρχείο **raw** με n-διάστατα στοιχεία **(x,y,z,...,n)**. Το αρχείο περιλαμβάνει και μια κεφαλίδα για τον αριθμό των διαστάσεων του κάθε στοιχείου καθώς και το συνολικό αριθμό των στοιχείων αυτών.
 Το πρόγραμμα διαβάζει ένα τέτοιο αρχείο ( μαζί με την κεφαλίδα αυτού ) και στο πρώτο scanning ορίζει τα **min** και **max** της κάθε διάστασης.
 
-Κάθε διάσταση χωρίζεται σε κομμάτια ( **pages** ) με μια παράμετρο που ονομάζεται **pages**. Η παράμετρος αυτή είναι ίδια για κάθε διάσταση. Αποτέλεσμα αυτής της διαμέρισης της κάθε διάστασης είναι να δημιουργηθούν χωρία (τετράγωνα για τις 2 διαστάσεις, κύβοι για τις 3 διαστάσεις, υπερκύβοι για τις n διαστάσεις). Ο αριθμός των χωρίων ορίζεται από πριν και άρα το εύρος αυτών εξαρτάται από τις μέγιστες και ελάχιστες τιμές των στοιχείων του αρχείου raw για κάθε διάσταση. Το χωρίο με ελάχιστα άκρα τα ελάχιστα **(x,y)** εμπίπτει στην αρχή των αξόνων **(0,0)**. Εκτός των ελαχίστων, κάθε χωρίο έχει και μέγιστα. **Η διαφορά των μεγίστων και ελαχίστων σε κάθε διάσταση για ένα χωρίο αποτελεί το εύρος του χωρίου στον άξονα και το χώρο**. 
+Κάθε διάσταση χωρίζεται σε κομμάτια ( **pages** ) με μια παράμετρο που ονομάζεται **pages**. Η παράμετρος αυτή είναι ίδια για κάθε διάσταση. Αποτέλεσμα αυτής της διαμέρισης της κάθε διάστασης είναι να δημιουργηθούν χωρία (τετράγωνα για τις 2 διαστάσεις, κύβοι για τις 3 διαστάσεις, υπερκύβοι για τις n διαστάσεις). Ο αριθμός των χωρίων ορίζεται από πριν και άρα το εύρος αυτών εξαρτάται από τις μέγιστες και ελάχιστες τιμές των στοιχείων του αρχείου **raw** για κάθε διάσταση. Το χωρίο με ελάχιστα άκρα τα ελάχιστα **(x,y)** εμπίπτει στην αρχή των αξόνων **(0,0)**. Εκτός των ελαχίστων, κάθε χωρίο έχει και μέγιστα. **Η διαφορά των μεγίστων και ελαχίστων σε κάθε διάσταση για ένα χωρίο αποτελεί το εύρος του χωρίου στον άξονα και το χώρο**. 
 
 Ο συνολικός αριθμός των χωρίων στον n-διάστατο χώρο είναι pages^n --> [0, (pages^n)-1]
 
@@ -44,57 +44,57 @@
 
 Διαβάζουμε ένα αρχείο **raw** και δημιουργούμε ένα αρχείο **results** όπως περιέγραψα παραπανω.
 
-		while((line = br.readLine()) != null){
-			writer.newLine();
-			datas = line.split(" ");
-			// find on which pages this set of values is.
-			for(int i=0;i<datas.length;i++){
-				writer.append(datas[i]);
-				writer.append(' ');
-				tempd = Double.parseDouble(decf.format((Double.parseDouble(datas[i])-min[i])/steps[i]));
-				if(tempd>=(double)pages){
-					indexing[i] = pages-1;
-				}else if(tempd==0.0){ 
-				//has to do with negative indexing which I'm trying to defeat with this line.
-					indexing[i] = 0;
-				}else{
-					indexing[i] = (int)(Math.ceil(tempd)-1);
-				}
-			} 
-			// binary represenation. rbits = 3 
-			//(for 8 pages, so i'll zero pad numbers that have less than 3 bits;
-			//1->001,11->011, etc.)
-			for(int i=0;i<indexing.length;i++){
-				b = Integer.toBinaryString(indexing[i]);
-				while(b.length()<rbits){
-					b = "0"+b;
-				}
-				bins[i] = b.toString().trim();
-			}
-			// interleaving.
-			for(int i=0;i<bins.length;i++){
-				binholder = bins[i].split("(?!^)");
-				for(int j=0;j<rbits;j++){
-					binswap[j][i] = binholder[j];
-				}
-			}
-			b = "";
-			for(int i=0;i<rbits;i++){
-				for(int j=0;j<n;j++){
-					b = b + binswap[i][j];
-				}
-			}
-			z = b;
-			//concatenate.
-			b="";
-			for(int i=0;i<bins.length;i++){
-				b = b+bins[i];
-			}
-			c = b;
-			writer.append(c);
+	while((line = br.readLine()) != null){
+		writer.newLine();
+		datas = line.split(" ");
+		// find on which pages this set of values is.
+		for(int i=0;i<datas.length;i++){
+			writer.append(datas[i]);
 			writer.append(' ');
-			writer.append(z);
+			tempd = Double.parseDouble(decf.format((Double.parseDouble(datas[i])-min[i])/steps[i]));
+			if(tempd>=(double)pages){
+				indexing[i] = pages-1;
+			}else if(tempd==0.0){ 
+			//has to do with negative indexing which I'm trying to defeat with this line.
+				indexing[i] = 0;
+			}else{
+				indexing[i] = (int)(Math.ceil(tempd)-1);
+			}
+		} 
+		// binary represenation. rbits = 3 
+		//(for 8 pages, so i'll zero pad numbers that have less than 3 bits;
+		//1->001,11->011, etc.)
+		for(int i=0;i<indexing.length;i++){
+			b = Integer.toBinaryString(indexing[i]);
+			while(b.length()<rbits){
+				b = "0"+b;
+			}
+			bins[i] = b.toString().trim();
 		}
+		// interleaving.
+		for(int i=0;i<bins.length;i++){
+			binholder = bins[i].split("(?!^)");
+			for(int j=0;j<rbits;j++){
+				binswap[j][i] = binholder[j];
+			}
+		}
+		b = "";
+		for(int i=0;i<rbits;i++){
+			for(int j=0;j<n;j++){
+				b = b + binswap[i][j];
+			}
+		}
+		z = b;
+		//concatenate.
+		b="";
+		for(int i=0;i<bins.length;i++){
+			b = b+bins[i];
+		}
+		c = b;
+		writer.append(c);
+		writer.append(' ');
+		writer.append(z);
+	}
 
 
 Το αρχείο results περιέχει στην κεφαλίδα του:
@@ -123,7 +123,7 @@
 		bpz.insertKey(keyZ, entry, duplicates)
 	}
 
-Δημιουργώ έτσι δύο αρχεία δέντρων tree για κάθε αρχείο results, καθώς οι μέθοδοι ένωσης των bits πρέπει να μελετηθούν ανεξάρτητα.
+Δημιουργώ έτσι δύο αρχεία δέντρων **tree** για κάθε αρχείο **results**, καθώς οι μέθοδοι ένωσης των bits πρέπει να μελετηθούν ανεξάρτητα.
 Τα αρχεία αυτά είναι:
 
 	TreeC --> Αποθηκεύει κάθε στοιχείο στη δομή του δέντρου με Index το αποτέλεσμα του Concatenation
@@ -133,7 +133,7 @@
 
 # B+ Tree
 
-Ο φάκελος RangeQuery αποτελεί την υλοποίηση του B+ Tree. ( Credits στον andylamp: https://github.com/andylamp/BPlusTree ) 
+Ο φάκελος **RangeQuery** αποτελεί την υλοποίηση του B+ Tree. ( Credits στον andylamp: https://github.com/andylamp/BPlusTree ) 
 
 Πρόκεται για υλοποίηση B+ Tree πάνω στο δίσκο που χρησιμοποιείται για αποθήκευση κλειδιού-τιμής ( περισσότερες λεπτομέρειες αναφέρονται στο link ).
 
@@ -192,7 +192,7 @@ RangeQuery/BPlusTree/src/main/java/ds/bplus/**mdpf/**
 
 Η κλάση **ResultFile** παίρνει ως όρισμα ένα **DataFile instance object** καθώς και έναν ακέραιο αριθμό **pages** που ορίζει σε πόσα "κομμάτια" θα χωριστεί η κάθε διάσταση προκειμένου να δημιουργηθούν τα χωρία στον (δισ)διάστατο χώρο.
 
-Διαβάζει το αρχείο DataFile (που βρίσκεται στη μνήμη, σε κάποιο κατάλογο, είτε δίνοντας το όνομα του αρχείου raw, είτε δίνοντας το όρισμα του DataFile object.)
+Διαβάζει το αρχείο **DataFile** (που βρίσκεται στη μνήμη, σε κάποιο κατάλογο, είτε δίνοντας το όνομα του αρχείου raw, είτε δίνοντας το όρισμα του **DataFile** object.)
 
 	ResultFile rf = new ResultFile(new DataFile(100000), 8)
 		
@@ -697,13 +697,9 @@ Aρχικά, βρίσκω το πρώτο index που υπάρχει στο δ�
 	* **TreeConstructionTime-100K-pages[i]-pageSize[i]-System.currentTimeMillis().txt**
 	
 	
-	
-	
-	
 # TO-DOs
 
 * Να δημουργήσω αρχεία **DataFile** που να παράγουν δεδομένα με διαφορετικές τυπικές αποκλίσεις.
-* Να βελτιώσω την μέθοδο **getElements()** για να δουλεύει σωστά και για την περίπτωση που δεν υπάρχει κάποιο index.
 * Να προσθέσω μεθόδους για:
 	* **Local Cohesion Cost**
 	* **Global Cohesion Cost**
