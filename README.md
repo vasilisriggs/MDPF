@@ -162,8 +162,10 @@ RangeQuery/BPlusTree/src/main/java/ds/bplus/**mdpf/**
 	.
 	.
 	
+	
 Έχω δημιουργήσει τέσσερα (4) είδη κλάσεων **DataFile** στο **ds.bplus.data** κατάλογο. Είναι τα:
-* **UniformDataFile.java** : Στην οποία τα στοιχεία είναι **Random**, μοντελοποιούν συντεταγμένες (στα όρια των ΗΠΑ) με δεκαδική ακρίβεια **6** ψηφίων.
+
+**UniformDataFile.java**: Τα στοιχεία είναι **Random**, μοντελοποιούν συντεταγμένες (στα όρια των ΗΠΑ) με δεκαδική ακρίβεια **6** ψηφίων.
 
 	DecimalFormat df  = new DecimalFormat("#.######");
 	// *United States of America* 
@@ -172,8 +174,35 @@ RangeQuery/BPlusTree/src/main/java/ds/bplus/**mdpf/**
 	private final double long_max = -68.275846;	//maximum longitude
 	private final double long_min = -124.874623;	//minimum longitude
 	
-και ακολουθούν μια κατανομή με συγκεκριμένη τυπική απόκλιση **σ**.
+και ακολουθούν ομοιόμορφη κατανομή. Η κατηγορία της κλάσης είναι 
+	
+	private String category = "uniform";
 		
+		
+**GaussianDataFile.java**: Είναι ακριβώς όπως η προηγούμενη, με τη διαφορά ότι τα στοιχεία ακολουθούν την κανονική κατανομή.		
+		
+	private String category = "gaussian";
+	
+**ClusterDataFile.java**: Τα στοιχεία αποθηκεύονται ομοιόμορφα γύρω από **N** στοιχεία αναφοράς **(x,y)**.
+Τα στοιχεία αναφοράς παράγονται ψευδοτυχαία ακολουθώντας ομοιόμορφη κατανομή. Σε μέγιστη απόσταση **σ** από κάθε στοιχείο αναφοράς.
+Το καινούργιο **lowerBound** και **upperBound** για κάθε διάσταση που αποτελούν τα όρια για την παραγωγή των στοιχείων υπολογίζονται:
+	
+	//Βρίσκω πρώτα το εύρος σε κάθε διάσταση.
+	rangeX = Xmax - Xmin  
+	rangeY = Yman - Ymin
+	
+	//Υπολογίζω τις αποστάσεις για το σημείο αναφοράς.
+	
+	//για το Χ
+	lowerBound[0] = x_ref - (rangeX*s)/100;
+	upperbound[0] = x_ref + (rangeX*s)/100;
+	
+	//για το y
+	lowerBound[1] = y_ref - (rangeY*s)/100;
+	upperBound[1] = y_ref + (rangeY*s)/100;
+	
+όπου **(x_ref,y_ref)** το σημείο αναφοράς και **s** η απόσταση σε ποσοστό% εκατέρωθεν [-s,+s] από το σημείο αυτό.
+	
 	DataFile df = new DataFile(100000)
 		
 δίνει αποτέλεσμα
