@@ -173,11 +173,11 @@ RangeQuery/BPlusTree/src/main/java/ds/bplus/**mdpf/**
 	
 και ακολουθούν μια κατανομή με συγκεκριμένη τυπική απόκλιση **σ**.
 		
-		DataFile df = new DataFile(100000)
+	DataFile df = new DataFile(100000)
 		
 δίνει αποτέλεσμα
 
-		RangeQuery/DataDirectory/category/raw/100K.txt
+	RangeQuery/DataDirectory/category/raw/100K.txt
 
 Η κλάση χειρίζεται και την περίπτωση δημιουργίας πολλαπλών αρχείων **raw** ίδιου αριθμού στοιχείων.
 		
