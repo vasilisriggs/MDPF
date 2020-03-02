@@ -8,7 +8,7 @@
 
 Ο συνολικός αριθμός των χωρίων στον n-διάστατο χώρο είναι pages^n --> [0, (pages^n)-1]
 
-Κάθε διάσταση έχει ένα **min** και ένα **max**. Το συνολικό εύρος κάθε διάστασης βρίσκεται από τη διαφορά **max-min**. Το εύρος που πρέπει να έχει κάθε χωρίο στην **i**-οστή διάσταση ισούται με το συνολικό εύρος της **i**-οστής διάστασης δια τον αριθμό των pages.  
+Κάθε διάσταση έχει ένα **min** και ένα **max**. Το συνολικό εύρος κάθε διάστασης βρίσκεται από τη διαφορά **max-min**. Το εύρος που πρέπει να έχει κάθε χωρίο στην **i**-οστή διάσταση ισούται με το συνολικό εύρος της **i**-οστής διάστασης δια τον αριθμό των **pages**.  
 
 	for(int i=0;i<steps.length;i++){
 		steps[i] = (double)((max[i]-min[i])/pages);
@@ -42,7 +42,7 @@
 	Ο δεκαδικός αριθμός που προκύπτει αποτελεί το μοναδικό αναγνωριστικό για κάθε χωρίο και 
 	σε κάθε στοιχείο που "πέφτει" πάνω σε εκείνο το χωρίο προσδίδεται αυτό το αναγνωριστικό.
 
-Διαβάζουμε ένα αρχείο **raw** και δημιουργούμε ένα αρχείο **results** όπως περιέγραψα παραπανω.
+Διαβάζουμε ένα αρχείο **raw** και δημιουργούμε ένα αρχείο **indexed** όπως περιέγραψα παραπανω.
 
 	while((line = br.readLine()) != null){
 		writer.newLine();
@@ -97,7 +97,7 @@
 	}
 
 
-Το αρχείο results περιέχει στην κεφαλίδα του:
+Το αρχείο **indexed περιέχει στην κεφαλίδα του:
 	
 	Αριθμό Στοιχείων Αριθμός Διαστάσεων C-Index Z-Index
 	Min	Max	X
@@ -177,15 +177,15 @@ RangeQuery/BPlusTree/src/main/java/ds/bplus/**mdpf/**
 		
 δίνει αποτέλεσμα
 
-		RangeQuery/multi/raw/100K.txt
+		RangeQuery/DataDirectory/category/raw/100K.txt
 
 Η κλάση χειρίζεται και την περίπτωση δημιουργίας πολλαπλών αρχείων **raw** ίδιου αριθμού στοιχείων.
 		
-	RangeQuery/multi/raw/100K_1.txt
-	RangeQuery/multi/raw/100K_2.txt
-	RangeQuery/multi/raw/100K_3.txt
-	RangeQuery/multi/raw/100K_4.txt
-	RangeQuery/multi/raw/100K_5.txt
+	RangeQuery/DataDirectory/category/raw/100K_1.txt
+	RangeQuery/DataDirectory/category/raw/100K_2.txt
+	RangeQuery/DataDirectory/category/raw/100K_3.txt
+	RangeQuery/DataDirectory/category/raw/100K_4.txt
+	RangeQuery/DataDirectory/category/raw/100K_5.txt
 	
 
 # **ResultFile.java**: 
