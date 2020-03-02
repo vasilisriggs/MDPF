@@ -684,7 +684,24 @@ Aρχικά, βρίσκω το πρώτο index που υπάρχει στο δ�
 
 * **private ArrayList<Long> listSort(ArrayList<Long> al)**
 	
-Η **listSort()** παίρνει ως όρισμα μία **ArrayList<Long> al**, δημιουργεί ένα μονοδιάστατο πίνακα με αριθμό κελιών **pages*pages** 
+Η **listSort()** παίρνει ως όρισμα μία **ArrayList<**Long**>** **al**, δημιουργεί ένα μονοδιάστατο πίνακα με αριθμό κελιών [**pages*pages**] και για κάθε στοιχείο που βρίσκεται στη λίστα, θέτει την τιμή 1 στο αντίστοιχο index του πίνακα.
+
+	int[] array = new int[pages*pages];
+	for(int j=0;j<al.size();j++) {
+		array[Integer.parseInt(String.valueOf(al.get(j)))] = 1; //cant cast Long to int so I do it this way.
+	}
+Τα υπόλοιπα στοιχεία του πίνακα είναι 0. Διατρέχει τον πίνακα, και όσα indices έχουν την τιμή 1, τα προσθέτει στη λίστα. Με αυτό το τρόπο εξασφαλίζω ότι τα στοιχεία θα εισάγονται με αύξουσα ταξινομημένη σειρά στην λίστα **al**.
+
+	for(int k=0;k<array.length;k++) {
+		if(array[k]==1) {
+			al.add((long) k);
+		}
+	}
+	
+Τέλος, τριμάρει την λίστα στο σωστό μέγεθος και την επιστρέφει
+
+	al.trimToSize();
+	return al;
 
 
 # Αρχεία
