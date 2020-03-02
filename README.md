@@ -727,6 +727,7 @@ Aρχικά, βρίσκω το πρώτο index που υπάρχει στο δ�
 AIS-Data
 	nari_dynamic.csv
 BPlusTree
+
 	src/main/java/ds/bplus
 		bptree
 			BPlusConfiguration.java
@@ -766,6 +767,7 @@ BPlusTree
 			-
 		
 DataDirectory
+
 	cluster
 		bins
 		indexed
@@ -791,6 +793,7 @@ DataDirectory
 		statistics
 		stat-results
 src/com/compamy
+
 	Main.java
 	Main2.java
 	..
