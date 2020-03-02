@@ -242,8 +242,8 @@ RangeQuery/BPlusTree/src/main/java/ds/bplus/**mdpf/**
 		
 Ο πρώτος τρόπος είναι πιο χρηστικός και προτιμότερος για πολλαπλά αρχεία.
 
-Το output της κλάσης **ResultFile** είναι ένα αρχείο **result** το οποίο συζητείται στην αρχή μαζί με τις μεθόδους ένωσης bits.
-Το αρχείο **result** έχει την παρακάτω μορφή
+Το output της κλάσης **IndexingFile** είναι ένα αρχείο **indexed** το οποίο συζητείται στην αρχή μαζί με τις μεθόδους ένωσης bits.
+Το αρχείο **indexed** έχει την παρακάτω μορφή
 
 	numberOfElements Dimensions C-Index Z-Index
 	Min	Max	X
@@ -255,33 +255,33 @@ RangeQuery/BPlusTree/src/main/java/ds/bplus/**mdpf/**
 	.
 	.
 	
-Το αρχείο **result**:
+Το αρχείο **indexed**:
 
-	RangeQuery/multi/results/100K_8_res.txt
+	RangeQuery/catego/results/100K_8_res.txt
 
 και για πολλαπλά αρχεία
 
-	RangeQuery/multi/results/100K_1_8_res.txt
-	RangeQuery/multi/results/100K_2_8_res.txt
-	RangeQuery/multi/results/100K_3_8_res.txt
-	RangeQuery/multi/results/100K_4_8_res.txt
-	RangeQuery/multi/results/100K_5_8_res.txt
+	RangeQuery/DataDirectory/category/indexed/100K_1_8_res.txt
+	RangeQuery/DataDirectory/category/indexed/100K_2_8_res.txt
+	RangeQuery/DataDirectory/category/indexed/100K_3_8_res.txt
+	RangeQuery/DataDirectory/category/indexed/100K_4_8_res.txt
+	RangeQuery/DataDirectory/category/indexed/100K_5_8_res.txt
 		
 		
 # **TreeFile.java**:
 
-Η κλάση **TreeFile** παίρνει ως όρισμα ένα **ResultFile instance object** καθώς και ένα σετ μεταβλητών (ακέραιοι) που αρχικοποιούν ένα δέντρο B+ Tree.
+Η κλάση **TreeFile** παίρνει ως όρισμα ένα **IndexingFile instance object** καθώς και ένα σετ μεταβλητών (ακέραιοι) που αρχικοποιούν ένα δέντρο B+ Tree.
 
 Ο **constructor** της κλάσης είναι (απλοποιημένη μορφή):
 
 	private BPlusConfiguration bconf;
 	private BPlusTreePerformanceCounter bPerf;
 
-	public TreeFile(int pageSize, int keySize, int entrySize, ResultFile rf) throws IOException, InvalidBTreeStateException{
+	public TreeFile(int pageSize, int keySize, int entrySize,IndexingFile rf) throws IOException, InvalidBTreeStateException{
 		String readMode = "rw+";
 		this.bconf = new BPlusConfiguration(pageSize,keySize,entrySize);
 		this.bPerf = new BPlusTreePerformanceCounter(true);
-		this.rf = rf;
+		this.inf = inf;
 	}
 
 Η κλάση **BPlusConfiguration** ουσιαστικά αρχικοποιεί το δέντρο με τις παραμέτρους **pageSize**, **keySize**, **entrySize**.
@@ -393,7 +393,7 @@ RangeQuery/BPlusTree/src/main/java/ds/bplus/**mdpf/**
 	private int totalOverflowPagesDeletions;
 
 
-Στον ίδιο constructor της **TreeFile**, εισάγω τα στοιχεία του **Result object instance**:
+Στον ίδιο constructor της **TreeFile**, εισάγω τα στοιχεία του **IndexFile object instance**:
 
 	while((line = br.readLine()) != null) {
 		datas = line.split(" ");
@@ -413,21 +413,21 @@ RangeQuery/BPlusTree/src/main/java/ds/bplus/**mdpf/**
 	
 με **bconf**, **readMode** και **bPerf** όπως ορίστηκαν παραπάνω. Το **writeFileC** και **writeFileZ** είναι τα ονόματα των αρχείων δέντρου. Για κάθε αρχείο **result** παράγονται δέντρα για κάθε τεχνική ένωσης bits.
 	
-	RangeQuery/multi/bins/Tree_100K_8_res_1024_8_24_C.bin
-	RangeQuery/multi/bins/Tree_100K_8_res_1024_8_24_Z.bin
+	RangeQuery/DataDirectory/category/bins/Tree_100K_8_res_1024_8_24_C.bin
+	RangeQuery/DataDirectory/category/bins/Tree_100K_8_res_1024_8_24_Z.bin
 	
 και για πολλαπλά αρχεία
 	
-	RangeQuery/multi/bins/Tree_100K_1_8_res_1024_8_24_C.bin
-	RangeQuery/multi/bins/Tree_100K_1_8_res_1024_8_24_Z.bin
-	RangeQuery/multi/bins/Tree_100K_2_8_res_1024_8_24_C.bin
-	RangeQuery/multi/bins/Tree_100K_2_8_res_1024_8_24_Z.bin
-	RangeQuery/multi/bins/Tree_100K_3_8_res_1024_8_24_C.bin
-	RangeQuery/multi/bins/Tree_100K_3_8_res_1024_8_24_Z.bin
-	RangeQuery/multi/bins/Tree_100K_4_8_res_1024_8_24_C.bin
-	RangeQuery/multi/bins/Tree_100K_4_8_res_1024_8_24_Z.bin
-	RangeQuery/multi/bins/Tree_100K_5_8_res_1024_8_24_C.bin
-	RangeQuery/multi/bins/Tree_100K_5_8_res_1024_8_24_Z.bin
+	RangeQuery/DataDirectory/category/bins/Tree_100K_1_8_res_1024_8_24_C.bin
+	RangeQuery/DataDirectory/category/bins/Tree_100K_1_8_res_1024_8_24_Z.bin
+	RangeQuery/DataDirectory/category/bins/Tree_100K_2_8_res_1024_8_24_C.bin
+	RangeQuery/DataDirectory/category/bins/Tree_100K_2_8_res_1024_8_24_Z.bin
+	RangeQuery/DataDirectory/category/bins/Tree_100K_3_8_res_1024_8_24_C.bin
+	RangeQuery/DataDirectory/category/bins/Tree_100K_3_8_res_1024_8_24_Z.bin
+	RangeQuery/DataDirectory/category/bins/Tree_100K_4_8_res_1024_8_24_C.bin
+	RangeQuery/DataDirectory/category/bins/Tree_100K_4_8_res_1024_8_24_Z.bin
+	RangeQuery/DataDirectory/category/bins/Tree_100K_5_8_res_1024_8_24_C.bin
+	RangeQuery/DataDirectory/category/bins/Tree_100K_5_8_res_1024_8_24_Z.bin
 
 με 
 1) pageSize	= 1024 Bytes
@@ -474,6 +474,7 @@ RangeQuery/BPlusTree/src/main/java/ds/bplus/**mdpf/**
 	LeafElements-100K_1_256_res_1024-8-24_C.txt
 	και
 	LeafElements-100K_1_256_res_1024-8-24_Z.txt
+	
 που περιέχουν τον αριθμό και το εύρος των **indices** που βρίσκοντα σε κάθε φύλλο.
 Η μέθοδος ξεκινά από το πρώτο κλειδί (0) και τελειώνει στο τελευταίο ( (page^2)-1 ).
 
@@ -705,10 +706,11 @@ Aρχικά, βρίσκω το πρώτο index που υπάρχει στο δ�
 	getTotalTreePages();
 πάνω στο αντικείμενο δέντρου που αντιστοιχεί στο συγκεκριμένο αρχείο.
 
-3) 
+3)
 
 	LeafElements-numberOfElements_x_pages_res_pageSize-keySize-entrySize_C.txt
 	LeafElements-numberOfElements_x_pages_res_pageSize-keySize-entrySize_Z.txt
+	
 που αποθηκεύει τον αριθμό και το εύρος των indices που βρίσκονται σε κάθε φύλλο.
 
 4) 
@@ -720,28 +722,78 @@ Aρχικά, βρίσκω το πρώτο index που υπάρχει στο δ�
 		
 
 ----------------------------------------------------------------------------------------------------------------------------
-# Updates and Implementations
-
-**Παραγωγή αρχείων:**
-
-* Κατανομή: 
-	* Ομοιόμορφη/Κανονική. (τυπική απόκλιση σ~0.05).                  // 2-9-2020
-* Αριθμός Στοιχείων 100K ( 100 χιλιάδες )
-	* pageSize = [1024, 2048, 4096, 8192, 16384] (Bytes)
-	* pages = [256, 512, 1024, 2048, 4096]
-	* 5 ξεχωριστά αρχεία για κάθε συνδυασμό
-* Για κάθε ένα από τα αρχεία αυτά:
-	* **Key-Value-InsertionTime-100K_x_pages[i]_res_pageSize[i]-8-24_C(ή Z).txt**
-	* **TreeBlockNumber-100K-pages[i]-pageSize[i]-System.currentTimeMillis().txt**
-	* **LeafElements-100K_x_pages[i]_res_pageSize[i]-8-24_C(ή Ζ).txt**
-	* **TreeConstructionTime-100K-pages[i]-pageSize[i]-System.currentTimeMillis().txt**
+#Directory - RangeQuery
 	
+AIS-Data
+	nari_dynamic.csv
+BPlusTree
+	src/main/java/ds/bplus
+		bptree
+			BPlusConfiguration.java
+			BPlusTree.java
+			BPlusTreePerformanceCounter.java
+			DeleteResult.java
+			KeyValueWrapper.java
+			RangeResult.java
+			SearchResult.java
+			TreeInternalNode.java
+			TreeLeaf.java
+			TreeLookupOverflowNode.java
+			TreeNode.java
+			TreeNodeType.java
+			TreeOverflow.java
+		data
+			ClusterDataFile.java
+			GaussianDataFile.java
+			RealDataFile.java
+			UniformDataFile.java
+		fudger
+			-
+		mdpf
+			DataFile.java
+			FileMods.java
+			IndexingFile.java
+			StatFile.java
+			TreeFile.java
+			TreeMods.java
+		multiple
+			ManageFile.java
+		object
+			KeyValuesObject.java
+			QueryComponentsObject.java
+			TimeQuarters.java
+		util
+			-
+		
+DataDirectory
+	cluster
+		bins
+		indexed
+		raw
+		statistics
+		stat-results
+	gaussian
+		bins
+		indexed
+		raw
+		statistics
+		stat-results
+	real
+		bins
+		indexed
+		raw
+		statistics
+		stat-results
+	uniform
+		bins
+		indexed
+		raw
+		statistics
+		stat-results
+src/com/compamy
+	Main.java
+	Main2.java
+	..
+	Mains....
 	
-# TO-DOs
-
-* Να δημουργήσω αρχεία **DataFile** που να παράγουν δεδομένα με διαφορετικές τυπικές αποκλίσεις.
-* Να προσθέσω μεθόδους για:
-	* **Local Cohesion Cost**
-	* **Global Cohesion Cost**
-* Να δημιουργήσω μέθοδο για Query logging (αναλυτικά αποτελέσματα σε .txt αρχείο)
 	
