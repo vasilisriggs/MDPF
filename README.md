@@ -97,7 +97,7 @@
 	}
 
 
-Το αρχείο **indexed περιέχει στην κεφαλίδα του:
+Το αρχείο **indexed** περιέχει στην κεφαλίδα του:
 	
 	Αριθμό Στοιχείων Αριθμός Διαστάσεων C-Index Z-Index
 	Min	Max	X
@@ -109,7 +109,7 @@
 	.
 	.
 
-Στη συνέχεια, διαβάζω ένα αρχείο **results** για να αποθηκεύσω τα στοιχεία αυτά σε ένα αρχείο **tree** που υλοποιεί ενα B+ Tree.
+Στη συνέχεια, διαβάζω ένα αρχείο **indexed** για να αποθηκεύσω τα στοιχεία αυτά σε ένα αρχείο **tree** που υλοποιεί ενα B+ Tree.
 
 	while((line = br.readLine()) != null) {
 		
@@ -163,7 +163,7 @@ RangeQuery/BPlusTree/src/main/java/ds/bplus/**mdpf/**
 	.
 	
 	
-Έχω δημιουργήσει τέσσερα (4) είδη κλάσεων **DataFile** στο **ds.bplus.data** κατάλογο. Είναι τα:
+Έχω δημιουργήσει τέσσερα (4) είδη κλάσεων **DataFile** στο **ds.bplus.data** κατάλογο. Είναι τα ακόλουθα:
 
 **UniformDataFile.java**: Τα στοιχεία είναι **Random**, μοντελοποιούν συντεταγμένες (στα όρια των ΗΠΑ) με δεκαδική ακρίβεια **6** ψηφίων.
 
@@ -184,7 +184,7 @@ RangeQuery/BPlusTree/src/main/java/ds/bplus/**mdpf/**
 	private String category = "gaussian";
 	
 **ClusterDataFile.java**: Τα στοιχεία αποθηκεύονται ομοιόμορφα γύρω από **N** στοιχεία αναφοράς **(x,y)**.
-Τα στοιχεία αναφοράς παράγονται ψευδοτυχαία ακολουθώντας ομοιόμορφη κατανομή. Σε μέγιστη απόσταση **σ** από κάθε στοιχείο αναφοράς.
+Τα στοιχεία αναφοράς παράγονται ψευδοτυχαία ακολουθώντας ομοιόμορφη κατανομή και τα στοιχεία προς αποθήκευση παράγονται σε μέγιστη απόσταση **σ** από κάθε στοιχείο αναφοράς.
 Το καινούργιο **lowerBound** και **upperBound** για κάθε διάσταση που αποτελούν τα όρια για την παραγωγή των στοιχείων υπολογίζονται:
 	
 	//Βρίσκω πρώτα το εύρος σε κάθε διάσταση.
@@ -201,9 +201,19 @@ RangeQuery/BPlusTree/src/main/java/ds/bplus/**mdpf/**
 	lowerBound[1] = y_ref - (rangeY*s)/100;
 	upperBound[1] = y_ref + (rangeY*s)/100;
 	
-όπου **(x_ref,y_ref)** το σημείο αναφοράς και **s** η απόσταση σε ποσοστό% εκατέρωθεν [-s,+s] από το σημείο αυτό.
+όπου **(x_ref,y_ref)** το σημείο αναφοράς και **s** η απόσταση σε ποσοστό % εκατέρωθεν από το σημείο αυτό.
 	
-	DataFile df = new DataFile(100000)
+	private String category = "cluster";
+	
+**RealDataFile.java**: Η κλάση αυτή διαβάζει ένα αρχείο .csv με πραγματικά δεδομένα, απομονώνει τα **longitude** και **latitude** και τα αποθηκεύει σε αρχείο **raw**. Ο αριθμός των γραμμών που διαβάζει από το αρχείο .csv, και εν τέλει αποθηκεύει σε ένα αρχείο **raw** είναι ίσος με τον αριθμό που παίρνει σαν όρισμα στον constructor της, η κλάση **RealDataFile**.
+	
+	private String category = "real";
+
+Προκειμένου να χρησιμοποιήσω κάποια από τις παραπάνω κλάσεις, την φορτώνω στην κλάση **DataFile** ( διορθώνοντας στα σημεία του **package**, και ονομασίες κλάσεων και constructor ) προκειμένου η **DataFile.java** να μπορεί να τρέξει.  
+	
+Παράδειγμα εκτέλεσης 100 χιλιάδων στοιχείων:	
+
+	DataFile df = new DataFile(100000,"");
 		
 δίνει αποτέλεσμα
 
@@ -211,11 +221,11 @@ RangeQuery/BPlusTree/src/main/java/ds/bplus/**mdpf/**
 
 Η κλάση χειρίζεται και την περίπτωση δημιουργίας πολλαπλών αρχείων **raw** ίδιου αριθμού στοιχείων.
 		
-	RangeQuery/DataDirectory/category/raw/100K_1.txt
-	RangeQuery/DataDirectory/category/raw/100K_2.txt
-	RangeQuery/DataDirectory/category/raw/100K_3.txt
-	RangeQuery/DataDirectory/category/raw/100K_4.txt
-	RangeQuery/DataDirectory/category/raw/100K_5.txt
+	RangeQuery/DataDirectory/category/raw/100K_1.txt //suffix = "1";
+	RangeQuery/DataDirectory/category/raw/100K_2.txt //..
+	RangeQuery/DataDirectory/category/raw/100K_3.txt //..
+	RangeQuery/DataDirectory/category/raw/100K_4.txt //..
+	RangeQuery/DataDirectory/category/raw/100K_5.txt //..
 	
 
 # **ResultFile.java**: 
