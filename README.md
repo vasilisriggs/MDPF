@@ -725,6 +725,7 @@ Aρχικά, βρίσκω το πρώτο index που υπάρχει στο δ�
 #Directory - RangeQuery
 	
 AIS-Data
+
 	nari_dynamic.csv
 BPlusTree
 
