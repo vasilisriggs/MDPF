@@ -201,7 +201,7 @@ RangeQuery/BPlusTree/src/main/java/ds/bplus/**mdpf/**
 	lowerBound[1] = y_ref - (rangeY*s)/100;
 	upperBound[1] = y_ref + (rangeY*s)/100;
 	
-όπου **(x_ref,y_ref)** το σημείο αναφοράς και **s** η απόσταση σε ποσοστό % εκατέρωθεν από το σημείο αυτό.
+όπου **(x_ref,y_ref)** το σημείο αναφοράς και **s** η απόσταση σε ποσοστό % εκατέρωθεν του σημείου αυτού.
 	
 	private String category = "cluster";
 	
