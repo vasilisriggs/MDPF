@@ -1,17 +1,17 @@
 package ds.bplus.multiple;
 
 import java.io.IOException;
+
+import ds.bplus.data.UniformDataFile;
 import ds.bplus.mdpf.*;
 import ds.bplus.util.InvalidBTreeStateException;
 
 public class ManageFiles{
 	private DataFile[] df;
-	private ResultFile[] rf;
+	private IndexingFile[] inf;
 	private StatFile[] sf;
 	private TreeFile[] tf;
 	private TreeMods[] tm;
-	
-	private final int numberOfIterations = 1;
 	
 	public ManageFiles(int numberOfFiles, int elements , int pages, int pageSize, int keySize, int entrySize, boolean statFiles, boolean timeQuartersManager, boolean fileMods, boolean leafElements) throws IOException, InvalidBTreeStateException {
 		String fileSuffix = String.valueOf(numberOfFiles);
@@ -20,7 +20,7 @@ public class ManageFiles{
 		String[][] names = new String[numberOfFiles][2];
 		int charBits = fileSuffix.length();
 		df = new DataFile[numberOfFiles];
-		rf = new ResultFile[numberOfFiles];
+		inf = new IndexingFile[numberOfFiles];
 		sf = new StatFile[numberOfFiles];
 		tf = new TreeFile[numberOfFiles];
 		tm = new TreeMods[numberOfFiles];
@@ -33,17 +33,17 @@ public class ManageFiles{
 				fileSuffix = "0"+fileSuffix;
 			}
 			df[i] = new DataFile(elements,fileSuffix);
-			rf[i] = new ResultFile(df[i],pages);
+			inf[i] = new IndexingFile(df[i],pages);
 			if(statFiles) {
-				sf[i] = new StatFile(rf[i]);  
+				sf[i] = new StatFile(inf[i]);  
 			}
-			tf[i] = new TreeFile(pageSize,keySize,entrySize, rf[i]);
+			tf[i] = new TreeFile(pageSize,keySize,entrySize, inf[i]);
 			tm[i] = new TreeMods(tf[i]);
 			
 			times[i][0] = tf[i].returnTimeC();
 			times[i][1] = tf[i].returnTimeZ();
-			names[i][0] = tf[i].getFilenameC();
-			names[i][1] = tf[i].getFilenameZ();
+			names[i][0] = tf[i].getFileNameC();
+			names[i][1] = tf[i].getFileNameZ();
 			blockNums[i][0] = tf[i].getBTreeC().getTotalTreePages();
 			blockNums[i][1] = tf[i].getBTreeZ().getTotalTreePages();
 			
@@ -52,14 +52,10 @@ public class ManageFiles{
 			}
 		}
 		
-		if(timeQuartersManager) {
-			TimeQuarterManager tqm = new TimeQuarterManager(df, rf, tf, tm, numberOfIterations);
-		}
-		
 		if(!tf[0].binariesExisted()&&fileMods) {
 			FileMods fm = new FileMods();
-			fm.storeTreeTimes(df[0].returnFileFix(), rf[0].getPages(), tf[0].getBTreeC().getTreeConfiguration().getPageSize(), names, times);
-			fm.storeTreeBlocks(df[0].returnFileFix(), rf[0].getPages(), tf[0].getBTreeC().getTreeConfiguration().getPageSize(), names, blockNums);
+			fm.storeTreeTimes(df[0].getFileFix(), inf[0].getPages(), tf[0].getBTreeC().getTreeConfiguration().getPageSize(), names, times);
+			fm.storeTreeBlocks(df[0].getFileFix(),inf[0].getPages(), tf[0].getBTreeC().getTreeConfiguration().getPageSize(), names, blockNums);
 		}
 	}
 }

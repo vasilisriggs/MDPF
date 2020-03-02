@@ -37,7 +37,12 @@ public class TreeLeaf extends TreeNode {
         this.overflowList = new LinkedList<>();
         this.valueList = new LinkedList<>();
     }
-
+    
+    
+    
+    public LinkedList<Long> getOverflowList() {
+    	return(overflowList);
+    }
     public void addToOverflowList(int index, long value)
         {overflowList.add(index, value);}
 

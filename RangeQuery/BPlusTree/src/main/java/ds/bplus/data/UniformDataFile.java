@@ -1,10 +1,10 @@
-package ds.bplus.mdpf;
+package ds.bplus.data;
 
 import static java.lang.Integer.MAX_VALUE;
 import java.util.*;
 import java.io.*;
 import java.text.DecimalFormat;
-public class DataFile{
+public class UniformDataFile{
 	// *United States of America* 
 	private final double lat_max = 48.682856;
 	private final double lat_min = 25.712085;
@@ -30,7 +30,7 @@ public class DataFile{
 	
 	private int rows;
 	
-	public DataFile(int elements, String suffix) throws IOException{
+	public UniformDataFile(int elements, String suffix) throws IOException{
 		if(!suffix.isBlank()) {
 			suffix = "_"+suffix;
 		}

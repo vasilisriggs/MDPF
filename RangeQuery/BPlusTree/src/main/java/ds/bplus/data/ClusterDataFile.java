@@ -1,10 +1,10 @@
-package ds.bplus.mdpf;
+package ds.bplus.data;
 
 import static java.lang.Integer.MAX_VALUE;
 import java.util.*;
 import java.io.*;
 import java.text.DecimalFormat;
-public class DataFile{
+public class ClusterDataFile{
 	// *United States of America* 
 	private final double lat_max = 48.682856;
 	private final double lat_min = 25.712085;
@@ -22,17 +22,23 @@ public class DataFile{
 	private String filefix;
 	private String filename;
 	private String directory = "DataDirectory/";
-	private String category = "uniform/"; //cluser,gaussian,real,uniform
+	private String category = "cluster/"; //cluser,gaussian,real,uniform
 	private String folder = "raw/";
 	private String pathName = directory+category+folder;
-	
+
 	private boolean isMultiple;
 	
 	private int rows;
 	
-	public DataFile(int elements, String suffix) throws IOException{
+	private int s = 10; // s = 5 => σ = 5% etc.
+	private int pointsOfRef = 10; // reference points.
+	
+	public ClusterDataFile(int elements, String suffix) throws IOException{
 		if(!suffix.isBlank()) {
 			suffix = "_"+suffix;
+			isMultiple = true;
+		}else {
+			isMultiple = false;
 		}
 		String line;
 		String[] datas;
@@ -87,36 +93,73 @@ public class DataFile{
 		
 		DecimalFormat df  = new DecimalFormat("#.######");
     	BufferedWriter writer = new BufferedWriter(new FileWriter(writeFile, true));
+    	
     	Random r1 = new Random();
     	Random r2 = new Random();
+    	Random r3 = new Random();
+    	Random r4 = new Random();
+    	
     	double r_lat = 0.0;
     	double r_long = 0.0;
+    	
+    	double x_ref; // reference point x , longitude
+    	double y_ref; // reference point y , latitude
+    	
+    	double rangeX = Double.parseDouble(df.format(long_max - long_min));
+    	double rangeY = Double.parseDouble(df.format(lat_max - lat_min));
+    
+    	double[] lowerBound = new double[2];
+    	double[] upperBound = new double[2];
 	    	
     	writer.append(String.valueOf(elements));
     	writer.append(' ');
     	writer.append(String.valueOf(2));
 	    	
-    	for(int i=0;i<elements;i++){
-    		writer.newLine();
-    		r_lat = this.lat_min + r1.nextDouble()*(this.lat_max - this.lat_min);
-    		r_long = this.long_min + r2.nextDouble()*(this.long_max - this.long_min);
-    		writer.append(df.format(r_long));
-    		writer.append(' ');
-    		writer.append(df.format(r_lat));
-    		if(r_lat>max_lat) {
-    			max_lat = r_lat;
+    	for(int j=0;j<pointsOfRef;j++) { 
+    		x_ref = Double.parseDouble(df.format(this.long_min + r1.nextDouble()*(this.long_max - this.long_min)));
+    		y_ref = Double.parseDouble(df.format(this.lat_min  + r2.nextDouble()*(this.lat_max - this.lat_min)));
+    		
+    		lowerBound[0] = Double.parseDouble(df.format(x_ref - Double.parseDouble(df.format((rangeX*s)/100))));
+    		upperBound[0] = Double.parseDouble(df.format(x_ref + Double.parseDouble(df.format((rangeX*s)/100))));
+    		
+    		lowerBound[1] = Double.parseDouble(df.format(y_ref - Double.parseDouble(df.format((rangeY*s)/100))));
+    		upperBound[1] = Double.parseDouble(df.format(y_ref + Double.parseDouble(df.format((rangeY*s)/100))));
+    		
+    		if(lowerBound[0]<long_min) {
+    			lowerBound[0] = long_min;
     		}
-    		if(r_lat<min_lat) {
-    			min_lat = r_lat;
+    		if(upperBound[0]>long_max) {
+    			upperBound[0] = long_max;
     		}
-    		if(r_long>max_long) {
-    			max_long = r_long;
+    		if(lowerBound[1]<lat_min) {
+    			lowerBound[1] = lat_min;
     		}
-    		if(r_long<min_long){
-    			min_long = r_long;
+    		if(upperBound[1]>lat_max) {
+    			upperBound[1] = lat_max;
+    		}
+    		for(int i=0;i<(elements/pointsOfRef);i++) {
+    			writer.newLine();
+    			r_long = lowerBound[0] + r3.nextDouble()*(upperBound[0]-lowerBound[0]);
+    			r_lat  = lowerBound[1] + r4.nextDouble()*(upperBound[1]-lowerBound[1]); 
+    			
+    			writer.append(df.format(r_long));
+        		writer.append(' ');
+        		writer.append(df.format(r_lat));
+    			if(r_lat>max_lat) {
+        			max_lat = r_lat;
+        		}
+        		if(r_lat<min_lat) {
+        			min_lat = r_lat;
+        		}
+        		if(r_long>max_long) {
+        			max_long = r_long;
+        		}
+        		if(r_long<min_long){
+        			min_long = r_long;
+        		}
     		}
     	}
-    	writer.close();	
+    	writer.close();
     	mins[0] = min_long;
     	mins[1] = min_lat;
     	maxs[0] = max_long;

@@ -1,10 +1,10 @@
-package ds.bplus.mdpf;
+package ds.bplus.data;
 
 import static java.lang.Integer.MAX_VALUE;
 import java.util.*;
 import java.io.*;
 import java.text.DecimalFormat;
-public class DataFile{
+public class GaussianDataFile{
 	// *United States of America* 
 	private final double lat_max = 48.682856;
 	private final double lat_min = 25.712085;
@@ -22,7 +22,7 @@ public class DataFile{
 	private String filefix;
 	private String filename;
 	private String directory = "DataDirectory/";
-	private String category = "uniform/"; //cluser,gaussian,real,uniform
+	private String category = "gaussian/"; //cluser,gaussian,real,uniform
 	private String folder = "raw/";
 	private String pathName = directory+category+folder;
 	
@@ -30,7 +30,7 @@ public class DataFile{
 	
 	private int rows;
 	
-	public DataFile(int elements, String suffix) throws IOException{
+	public GaussianDataFile(int elements, String suffix) throws IOException{
 		if(!suffix.isBlank()) {
 			suffix = "_"+suffix;
 		}
@@ -98,8 +98,8 @@ public class DataFile{
 	    	
     	for(int i=0;i<elements;i++){
     		writer.newLine();
-    		r_lat = this.lat_min + r1.nextDouble()*(this.lat_max - this.lat_min);
-    		r_long = this.long_min + r2.nextDouble()*(this.long_max - this.long_min);
+    		r_lat = this.lat_min + r1.nextGaussian()*(this.lat_max - this.lat_min);
+    		r_long = this.long_min + r2.nextGaussian()*(this.long_max - this.long_min);
     		writer.append(df.format(r_long));
     		writer.append(' ');
     		writer.append(df.format(r_lat));

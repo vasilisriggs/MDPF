@@ -13,41 +13,57 @@ import ds.bplus.bptree.BPlusTreePerformanceCounter;
 import ds.bplus.util.InvalidBTreeStateException;
 
 public class TreeFile {
-	//private String rfDirectory = "data/results";
-	//private String treeDirectory = "data/bins";
-	private String rfDirectory = "multi/results";
-	private String treeDirectory = "multi/bins";
-	private String stDirectory = "multi/statistics";
-	private long timeC = 0L;
-	private long timeZ = 0L;
+	
+	private String directory = "DataDirectory/";
+	private String category; //cluser,gaussian,real,uniform
+	private String statFolder = "statistics/";
+	private String treeFolder = "bins/";
+	private String indexingFolder = "indexed/";
+	private String treePathName;
+	private String indexingPathName;
+	private String statPathName;
+	
 	private String filenameC;
 	private String filenameZ;
+	
+	
+	private long timeC = 0L;
+	private long timeZ = 0L;
+	
 	private double minX;
 	private double maxX;
 	private double minY;
 	private double maxY;
-	private ResultFile rf;
-	private BPlusConfiguration bconf;
-	private BPlusTreePerformanceCounter bPerf;
+	
 	private BPlusTree bpc;
 	private BPlusTree bpz;
+	private BPlusConfiguration bConf;
+	private BPlusTreePerformanceCounter bPerf;
+	private IndexingFile inf;
+	
 	private int pages;
 	private boolean binariesExisted;
 	
-	public TreeFile(int pageSize, int keySize, int entrySize, ResultFile rf) throws IOException, InvalidBTreeStateException{
+	public TreeFile(int pageSize, int keySize, int entrySize, IndexingFile inf) throws IOException, InvalidBTreeStateException{
 		
 		String readMode = "rw+";
-		this.bconf = new BPlusConfiguration(pageSize,keySize,entrySize);
+		this.bConf = new BPlusConfiguration(pageSize,keySize,entrySize);
 		this.bPerf = new BPlusTreePerformanceCounter(true);
-		this.rf = rf;
+		this.inf = inf;
 		
-		String readFile = rf.getResultFileName(); 
+		category = inf.getIndexingCategory();
+		treePathName = directory+category+treeFolder;
+		indexingPathName = directory+category+indexingFolder;
+		statPathName = directory+category+statFolder;
+		
+		String readFile = inf.getIndexingFileName(); // 10K_8_indexed.txt or 10K_1_8_indexed.txt
 		String[] splitFile = readFile.split("\\."); 
 		filenameC = "Tree_"+splitFile[0]+"_"+String.valueOf(pageSize)+"-"+String.valueOf(keySize+"-"+String.valueOf(entrySize))+"_C.bin"; 													
 		filenameZ = "Tree_"+splitFile[0]+"_"+String.valueOf(pageSize)+"-"+String.valueOf(keySize+"-"+String.valueOf(entrySize))+"_Z.bin";
-		pages = rf.getPages();
-		String writeFileC = treeDirectory+"/"+filenameC;
-		String writeFileZ = treeDirectory+"/"+filenameZ;
+		pages = inf.getPages();
+		
+		String writeFileC = treePathName+filenameC;
+		String writeFileZ = treePathName+filenameZ;
 		
 		File fc = new File(writeFileC);
 		File fz = new File(writeFileZ);
@@ -55,12 +71,12 @@ public class TreeFile {
 		if(fz.exists() && fc.exists()) {
 			System.out.println("Tree files already exist. Reading for values.");
 			readMode = "rw";
-			bpc = new BPlusTree(bconf,readMode,writeFileC,bPerf);
-			bpz = new BPlusTree(bconf,readMode,writeFileZ,bPerf);
-			minX = rf.getDataFile().getMinLongitude();
-			maxX = rf.getDataFile().getMaxLongitude();
-			minY = rf.getDataFile().getMinLatitude();
-			maxY = rf.getDataFile().getMaxLatitude();
+			bpc = new BPlusTree(bConf,readMode,writeFileC,bPerf);
+			bpz = new BPlusTree(bConf,readMode,writeFileZ,bPerf);
+			minX = inf.getDataObject().getMinLongitude();
+			maxX = inf.getDataObject().getMaxLongitude();
+			minY = inf.getDataObject().getMinLatitude();
+			maxY = inf.getDataObject().getMaxLatitude();
 			binariesExisted = true;
 			return;
 		}
@@ -68,10 +84,10 @@ public class TreeFile {
 		binariesExisted = false;
 		
 		System.out.println("Initializing TreeFile file. Inserting...");
-		BufferedReader br = new BufferedReader(new FileReader(rfDirectory+"/"+readFile));
+		BufferedReader br = new BufferedReader(new FileReader(indexingPathName+readFile));
 		
-		bpc = new BPlusTree(bconf,readMode,writeFileC,bPerf);
-		bpz = new BPlusTree(bconf,readMode,writeFileZ,bPerf);
+		bpc = new BPlusTree(bConf,readMode,writeFileC,bPerf);
+		bpz = new BPlusTree(bConf,readMode,writeFileZ,bPerf);
 		
 		
 		long start;
@@ -96,11 +112,11 @@ public class TreeFile {
 		
 		String nodePrefix = "Key-Value-InsertionTime"; // -2K_1_16_1024-8-24_C.txt . etc.
 		
-		String writeTimeC = stDirectory+"/"+nodePrefix+"-"+splitFile[0]+"_"+String.valueOf(pageSize)+"-"+String.valueOf(keySize+"-"+String.valueOf(entrySize))+"_C.txt";
-		String writeTimeZ = stDirectory+"/"+nodePrefix+"-"+splitFile[0]+"_"+String.valueOf(pageSize)+"-"+String.valueOf(keySize+"-"+String.valueOf(entrySize))+"_Z.txt";
+		String writeTimeC = statPathName+nodePrefix+"-"+splitFile[0]+"_"+String.valueOf(pageSize)+"-"+String.valueOf(keySize)+"-"+String.valueOf(entrySize)+"_C.txt";
+		String writeTimeZ = statPathName+nodePrefix+"-"+splitFile[0]+"_"+String.valueOf(pageSize)+"-"+String.valueOf(keySize)+"-"+String.valueOf(entrySize)+"_Z.txt";
 		
-		//BufferedWriter writerC = new BufferedWriter(new FileWriter(writeTimeC, true));
-		//BufferedWriter writerZ = new BufferedWriter(new FileWriter(writeTimeZ, true));
+		BufferedWriter writerC = new BufferedWriter(new FileWriter(writeTimeC, true));
+		BufferedWriter writerZ = new BufferedWriter(new FileWriter(writeTimeZ, true));
 		
 		int cnt = 0;
 		while((line = br.readLine()) != null) {
@@ -118,20 +134,20 @@ public class TreeFile {
 			end = System.currentTimeMillis();
 			timeC = timeC + (end-start);
 			
-			//writerC.append(String.valueOf(end-start));
-			//writerC.newLine();
+			writerC.append(String.valueOf(end-start));
+			writerC.newLine();
 			
 			start = System.currentTimeMillis();
 			bpz.insertKey(keyZ, entry, duplicates);
 			end = System.currentTimeMillis();
 			timeZ = timeZ + (end-start);
 			
-			//writerZ.append(String.valueOf(end-start));
-			//writerZ.newLine();
+			writerZ.append(String.valueOf(end-start));
+			writerZ.newLine();
 		}
 		
-		//writerZ.close();
-		//writerC.close();
+		writerZ.close();
+		writerC.close();
 		
 		bpc.commitTree();
 		bpz.commitTree();
@@ -141,7 +157,7 @@ public class TreeFile {
 	}
 	
 	public BPlusConfiguration getBConf() 
-	{return bconf;}
+	{return bConf;}
 	
 	public BPlusTreePerformanceCounter getBPerf() 
 	{return bPerf;}
@@ -170,14 +186,14 @@ public class TreeFile {
 	public int getPages() 
 	{return pages;}
 	
-	public String getFilenameC() 
+	public String getFileNameC() 
 	{return filenameC;}
 	
-	public String getFilenameZ() 
+	public String getFileNameZ() 
 	{return filenameZ;}
 	
-	public ResultFile getResultFile() 
-	{return rf;}
+	public IndexingFile getIndexingObject() 
+	{return inf;}
 	
 	public long returnTimeC() 
 	{return timeC;}

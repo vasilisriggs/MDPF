@@ -1,8 +1,6 @@
 package ds.bplus.mdpf;
 
 import java.io.*;
-import java.lang.*;
-import java.math.BigDecimal;
 import java.text.DecimalFormat;
 
 
@@ -29,7 +27,6 @@ public class FileMods {
 	 * @param times is the tree construction time of a tree.
 	 * @throws IOException
 	 */
-	
 	
 	public void storeTreeTimes(String filefix, int pages, int pageSize, String[][] names, long[][] times) throws IOException {
 		String filename = treeTimesFilename+"-"+filefix+"-"+String.valueOf(pages)+"-"+String.valueOf(pageSize)+"-"+String.valueOf(System.currentTimeMillis())+".txt";
@@ -77,6 +74,34 @@ public class FileMods {
 		return;		
 	}
 	
+	public void cleanDir() {
+		String[] folders = new String[5];
+		folders[0] = "bins/";
+		folders[1] = "indexed/";
+		folders[2] = "raw/";
+		folders[3] = "stat-results/";
+		folders[4] = "statistics/";
+		
+		String directory = "DataDirectory/";
+		
+		String[] category = new String[4];
+		category[0] = "cluster/";
+		category[1] = "gaussian/";
+		category[2] = "real/";
+		category[3] = "uniform/";
+		
+		File[] dataDir = null;
+		
+		for(int i=0;i<folders.length;i++) {
+			for(int j=0;j<category.length;j++) {		
+				dataDir = new File(directory+category[j]+folders[i]).listFiles();
+				for(int k=0;k<dataDir.length;k++) {
+					dataDir[k].delete();
+					System.out.println(dataDir[k]+" was deleted successfully");
+				}				
+			}
+		}
+	}
 	
 	public void sampling(int sampleFrequency) throws IOException {
 		String dir = "multi/statistics";
@@ -96,7 +121,6 @@ public class FileMods {
 		String writeFile;
 		File folder = new File(dir);
 		File[] listOfFiles = folder.listFiles(); // array of relative pathnames.
-		
 		
 		// I want to proccess only Key-Value-InsertionTime files.
 		for(int i=0;i<listOfFiles.length;i++) {

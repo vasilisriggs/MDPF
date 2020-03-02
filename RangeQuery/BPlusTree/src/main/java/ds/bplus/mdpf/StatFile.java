@@ -12,12 +12,12 @@ public class StatFile {
 	private String rfDirectory = "multi/results";
 	private String sfDirectory = "multi/stat-results";
 	private String filename;
-	private ResultFile rf;
-	public StatFile(ResultFile rf) throws IOException{
+	private IndexingFile rf;
+	public StatFile(IndexingFile rf) throws IOException{
 		this.rf = rf;
 		numberOfBlocks = (rf.getPages())*(rf.getPages());
 		int chars = String.valueOf(numberOfBlocks).length();
-		String readFile = rf.getResultFileName();
+		String readFile = rf.getIndexingFileName();
 		String[] splitFile = readFile.split("\\.");
 		filename = splitFile[0]+"_stats.txt";
 		String writeFile = sfDirectory+"/"+filename; 
@@ -66,6 +66,6 @@ public class StatFile {
 		writer.close();
 	}
 		
-	public ResultFile getResultFile() 
+	public IndexingFile getResultFile() 
 	{return this.rf;}
 }

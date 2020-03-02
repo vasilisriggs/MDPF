@@ -321,8 +321,8 @@ public class BPlusTree {
             TreeLeaf l = (TreeLeaf)n;
             novf = new TreeOverflow(-1L, l.getPageIndex(),
                     generateFirstAvailablePageIndex(conf));
-//            System.out.println("Creating overflow page with index: " + novf.getPageIndex() +
-//                    " for key: " + l.getKeyAt(index));
+            System.out.println("Creating overflow page with index: " + novf.getPageIndex() +
+                    " for key: " + l.getKeyAt(index));
             // push the first value
             novf.pushToValueList(value);
             novf.incrementCapacity(conf);

@@ -1,15 +1,9 @@
-package ds.bplus.mdpf;
+package ds.bplus.data;
 
 import static java.lang.Integer.MAX_VALUE;
-import java.util.*;
 import java.io.*;
 import java.text.DecimalFormat;
-public class DataFile{
-	// *United States of America* 
-	private final double lat_max = 48.682856;
-	private final double lat_min = 25.712085;
-	private final double long_max = -68.275846;
-	private final double long_min = -124.874623;
+public class RealDataFile{
 	
 	private double max_lat = -300;
 	private double min_lat = MAX_VALUE;
@@ -22,15 +16,16 @@ public class DataFile{
 	private String filefix;
 	private String filename;
 	private String directory = "DataDirectory/";
-	private String category = "uniform/"; //cluser,gaussian,real,uniform
+	private String category = "real/"; //cluser,gaussian,real,uniform
 	private String folder = "raw/";
 	private String pathName = directory+category+folder;
+	private String AIS_DataPath = "AIS-Data/nari_dynamic.csv";
 	
 	private boolean isMultiple;
 	
 	private int rows;
 	
-	public DataFile(int elements, String suffix) throws IOException{
+	public RealDataFile(int elements, String suffix) throws IOException{
 		if(!suffix.isBlank()) {
 			suffix = "_"+suffix;
 		}
@@ -53,6 +48,7 @@ public class DataFile{
 		}else if(timesFits==3){
 			fileletter = "B";
 		}
+		DecimalFormat df  = new DecimalFormat("#.######");
 		filefix = String.valueOf(elementsTemp)+fileletter;
 		filename = filefix+suffix+".txt";
 		String writeFile = pathName+filename;
@@ -63,17 +59,17 @@ public class DataFile{
 			line = br.readLine();
 			while((line = br.readLine())!=null){
 				datas = line.split(" ");
-				if(Double.parseDouble(datas[0])>max_long) {
-					max_long = Double.parseDouble(datas[0]);
+				if(Double.parseDouble(df.format(datas[6]))>max_long) {
+					max_long = Double.parseDouble(datas[6]);
 				}
-				if(Double.parseDouble(datas[0])<min_long) {
-					min_long = Double.parseDouble(datas[0]);
+				if(Double.parseDouble(df.format(datas[6]))<min_long) {
+					min_long = Double.parseDouble(datas[6]);
 				}
-				if(Double.parseDouble(datas[1])>max_lat) {
-					max_lat = Double.parseDouble(datas[1]);
+				if(Double.parseDouble(df.format(datas[7]))>max_lat) {
+					max_lat = Double.parseDouble(datas[7]);
 				}
-				if(Double.parseDouble(datas[1])<min_lat) {
-					min_lat = Double.parseDouble(datas[1]);
+				if(Double.parseDouble(df.format(datas[7]))<min_lat) {
+					min_lat = Double.parseDouble(datas[7]);
 				}
 			}
 			mins[0] = min_long;
@@ -85,37 +81,36 @@ public class DataFile{
 			return;
 		}
 		
-		DecimalFormat df  = new DecimalFormat("#.######");
     	BufferedWriter writer = new BufferedWriter(new FileWriter(writeFile, true));
-    	Random r1 = new Random();
-    	Random r2 = new Random();
-    	double r_lat = 0.0;
-    	double r_long = 0.0;
-	    	
+    	BufferedReader br = new BufferedReader(new FileReader(AIS_DataPath));
+    	
     	writer.append(String.valueOf(elements));
     	writer.append(' ');
     	writer.append(String.valueOf(2));
+	    int cnt = 0;
+	    while(((line = br.readLine())!=null)&&(cnt<elements)){
+	    	writer.newLine();
+	    	datas = line.split(",");
 	    	
-    	for(int i=0;i<elements;i++){
-    		writer.newLine();
-    		r_lat = this.lat_min + r1.nextDouble()*(this.lat_max - this.lat_min);
-    		r_long = this.long_min + r2.nextDouble()*(this.long_max - this.long_min);
-    		writer.append(df.format(r_long));
-    		writer.append(' ');
-    		writer.append(df.format(r_lat));
-    		if(r_lat>max_lat) {
-    			max_lat = r_lat;
-    		}
-    		if(r_lat<min_lat) {
-    			min_lat = r_lat;
-    		}
-    		if(r_long>max_long) {
-    			max_long = r_long;
-    		}
-    		if(r_long<min_long){
-    			min_long = r_long;
-    		}
-    	}
+	    	if(Double.parseDouble(datas[6])>max_long) {
+				max_long = Double.parseDouble(datas[6]);
+			}
+			if(Double.parseDouble(datas[6])<min_long) {
+				min_long = Double.parseDouble(datas[6]);
+			}
+			if(Double.parseDouble(datas[7])>max_lat) {
+				max_lat = Double.parseDouble(datas[7]);
+			}
+			if(Double.parseDouble(datas[7])<min_lat) {
+				min_lat = Double.parseDouble(datas[7]);
+			}
+			
+	    	writer.append(df.format(datas[6]));
+	    	writer.append(' ');
+	    	writer.append(df.format(datas[7]));
+	    	cnt++;
+	    }
+    	
     	writer.close();	
     	mins[0] = min_long;
     	mins[1] = min_lat;

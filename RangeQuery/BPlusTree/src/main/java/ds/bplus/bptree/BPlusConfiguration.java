@@ -226,7 +226,7 @@ public class BPlusConfiguration {
                 getOverflowPageDegree() +
                 "\n\tExpected cap: " + getMaxOverflowNodeCapacity());
 
-        System.out.println("\nLookup page overflow Degree" +
+        System.out.println("\nLookup page overflow Degree: " +
                 getOverflowPageDegree() +
                 "\n\tExpected cap: " + getMaxInternalNodeCapacity());
     }

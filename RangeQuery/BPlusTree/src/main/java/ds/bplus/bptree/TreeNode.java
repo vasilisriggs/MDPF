@@ -13,7 +13,6 @@ import java.util.LinkedList;
  * each of the node types have.
  *
  */
-@SuppressWarnings("unused")
 public abstract class TreeNode {
     final LinkedList<Long> keyArray;  // key array
     private TreeNodeType nodeType;    // actual node type
