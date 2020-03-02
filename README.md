@@ -161,10 +161,11 @@ RangeQuery/BPlusTree/src/main/java/ds/bplus/**mdpf/**
 	.
 	.
 	.
-Τα στοιχεία είναι **Random()**, μοντελοποιούν συντεταγμένες (στα όρια των ΗΠΑ) με δεκαδική ακρίβεια **6** ψηφίων
 	
+Έχω δημιουργήσει τέσσερα (4) είδη κλάσεων **DataFile** στο **ds.bplus.data** κατάλογο. Είναι τα:
+* **UniformDataFile.java** : Στην οποία τα στοιχεία είναι **Random**, μοντελοποιούν συντεταγμένες (στα όρια των ΗΠΑ) με δεκαδική ακρίβεια **6** ψηφίων.
+
 	DecimalFormat df  = new DecimalFormat("#.######");
-	
 	// *United States of America* 
 	private final double lat_max = 48.682856;	//maximum latitude
 	private final double lat_min = 25.712085;	//minimum latitude
