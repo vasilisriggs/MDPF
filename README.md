@@ -641,14 +641,14 @@ Aρχικά, βρίσκω το πρώτο index που υπάρχει στο δ�
 
 	list: [5,1,3,7,9,11,15] //indices
 	for i<-0 to list.size()
-		rangeSearch(list.get(i));
+		rangeSearch(list.get(i),list.get(i));
 	end for
 
 * **public QueryComponentsObject rangeFractionsQuery(double[] lb, double[] ub)**
 
 Η μέθοδος δουλεύει όπως οι προηγούμενες δύο (και επιστρέφει το ίδιο αντικείμενο). Όμως, αντίθετα με τις προηγούμενες, προσπαθεί να βρει εύρη συνεχόμενων indices για την **rangeSearch()**. 
 
-	
+	list.sort() // sort all elements to ascending order.
 	RangeResult rr;
 	int min <- list.get(0) //first index
 	int max <- list.get(0) //first index
@@ -672,12 +672,20 @@ Aρχικά, βρίσκω το πρώτο index που υπάρχει στο δ�
 	
 	list: [5,4,1,2,3,6,7,9,10,11,15] // example list.
 	
-	rangeSearch(5,5);
-	rangeSearch(4,4);
-	rangeSearch(1,3);
-	rangeSearch(6,7);
+	list.sort()
+	
+	list: [1,2,3,4,5,6,7,9,10,11,15] // list after sorting.
+	
+	rangeSearch(1,7);
 	rangeSearch(9,11);
 	rangeSearch(15,15);
+	
+Η μέθοδος που υλοποιεί την ταξινόμηση της λίστας είναι η:
+
+* **private ArrayList<Long> listSort(ArrayList<Long> al)**
+	
+Η **listSort()** παίρνει ως όρισμα μία **ArrayList<Long> al**, δημιουργεί ένα μονοδιάστατο πίνακα με αριθμό κελιών **pages*pages** 
+
 
 # Αρχεία
 
