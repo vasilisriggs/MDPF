@@ -10,6 +10,7 @@ import java.math.BigDecimal;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.LinkedList;
+import java.util.Random;
 
 import ds.bplus.bptree.*;
 import ds.bplus.object.*;
@@ -26,6 +27,7 @@ public class TreeMods{
 	private String category; //cluser,gaussian,real,uniform
 	private String treeFolder = "bins/";
 	private String statFolder = "statistics/";
+	private String queryFolder = "queries";
 	
 	private String statPathName;
 	private String treePathName;
@@ -432,6 +434,57 @@ public class TreeMods{
 				i--;
 			}
 		}
+	}
+	
+	
+	public void createPatterns() throws IOException {
+		int maxN = pages;
+		int minN = 2;
+		
+		for(int i=0;i<this.rbits;i++) {
+			createPatternPoints(maxN,minN);
+			maxN = maxN/2;
+			minN = minN*2;
+			if(maxN==1||minN>pages) {
+				return;
+			}
+		}
+		
+	}
+	private void createPatternPoints(int maxN, int minN) throws IOException {
+		Random r1 = new Random();
+		Random r2 = new Random();
+		
+		String queryFile = directory+category+queryFolder+"queryPattern_"+String.valueOf(maxN)+"X"+String.valueOf(minN)+".txt";
+		File f = new File(queryFile);
+		if(f.exists()) {
+			System.out.println(queryFile+" already exists. Returning.");
+			return;
+		}
+		
+		BufferedWriter writer = new BufferedWriter(new FileWriter(queryFile, true));
+		
+		double valueX = 0.0;
+		double valueY = 0.0;
+		int numberOfValues = 100;
+		for(int i=0;i<numberOfValues;i++) {
+			valueX = mins[0] + r1.nextDouble()*(maxs[0] - mins[0]);
+			valueX = Double.parseDouble(df.format(valueX));
+			while(!(((valueX+steps[0]*maxN>maxs[0])&&(valueX+steps[0]*(maxN-1)<=maxs[0]))||(valueX+steps[0]*maxN<=maxs[0]))){
+				valueX = mins[0] + r1.nextDouble()*(maxs[0] - mins[0]);
+				valueX = Double.parseDouble(df.format(valueX));
+			}
+			valueY = mins[1] + r2.nextDouble()*(maxs[1] - mins[1]);
+			valueX = Double.parseDouble(df.format(valueX));
+			while(!(((valueY+steps[1]*maxN>maxs[1])&&(valueY+steps[1]*(maxN-1)<=maxs[1]))||(valueY+steps[1]*maxN<=maxs[1]))){
+				valueY = mins[1] + r2.nextDouble()*(maxs[1] - mins[1]);
+				valueY = Double.parseDouble(df.format(valueY));
+			}
+			writer.append(String.valueOf(valueX)+" "+String.valueOf(valueY));
+			writer.newLine();
+		}
+		writer.close();
+		return;
 	}
 
 	private long getMinIndexFromList(ArrayList<Long> longlist){
