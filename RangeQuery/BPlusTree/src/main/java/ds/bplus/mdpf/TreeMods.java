@@ -436,7 +436,10 @@ public class TreeMods{
 		}
 	}
 	
-	
+	/**
+	 * Creates all possible patterns for a given number of pages.
+	 * @throws IOException
+	 */
 	public void createPatterns() throws IOException {
 		int maxN = pages;
 		int minN = 2;
@@ -451,10 +454,16 @@ public class TreeMods{
 		}
 		
 	}
+	/**
+	 * Given a Query Pattern, I generate values to match the dimensions of the pattern.
+	 * @param maxN is the X Dimension of the pattern
+	 * @param minN is the Y Dimension of the pattern
+	 * @throws IOException
+	 */
 	private void createPatternPoints(int maxN, int minN) throws IOException {
 		Random r1 = new Random();
 		Random r2 = new Random();
-		
+		int numberOfValues = 100;
 		String queryFile = directory+category+queryFolder+"queryPattern_"+String.valueOf(maxN)+"X"+String.valueOf(minN)+".txt";
 		File f = new File(queryFile);
 		if(f.exists()) {
@@ -466,17 +475,17 @@ public class TreeMods{
 		
 		double valueX = 0.0;
 		double valueY = 0.0;
-		int numberOfValues = 100;
+		
 		for(int i=0;i<numberOfValues;i++) {
 			valueX = mins[0] + r1.nextDouble()*(maxs[0] - mins[0]);
 			valueX = Double.parseDouble(df.format(valueX));
-			while(!(((valueX+steps[0]*maxN>maxs[0])&&(valueX+steps[0]*(maxN-1)<=maxs[0]))||(valueX+steps[0]*maxN<=maxs[0]))){
+			while(!(((valueX+(steps[0]*maxN)>maxs[0])&&(valueX+(steps[0]*(maxN-1))<=maxs[0]))||(valueX+(steps[0]*maxN)<=maxs[0]))){
 				valueX = mins[0] + r1.nextDouble()*(maxs[0] - mins[0]);
 				valueX = Double.parseDouble(df.format(valueX));
 			}
 			valueY = mins[1] + r2.nextDouble()*(maxs[1] - mins[1]);
 			valueX = Double.parseDouble(df.format(valueX));
-			while(!(((valueY+steps[1]*maxN>maxs[1])&&(valueY+steps[1]*(maxN-1)<=maxs[1]))||(valueY+steps[1]*maxN<=maxs[1]))){
+			while(!(((valueY+(steps[1]*minN)>maxs[1])&&(valueY+(steps[1]*(minN-1))<=maxs[1]))||(valueY+(steps[1]*minN)<=maxs[1]))){
 				valueY = mins[1] + r2.nextDouble()*(maxs[1] - mins[1]);
 				valueY = Double.parseDouble(df.format(valueY));
 			}
