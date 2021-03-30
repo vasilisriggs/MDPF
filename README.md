@@ -152,80 +152,72 @@ RangeQuery/BPlusTree/src/main/java/ds/bplus/**mdpf/**
 
 # **DataFile.java**: 
 
-Η κλάση **DataFile** παίρνει ως όρισμα τον αριθμό των στοιχείων και δημιουργεί ένα αρχείο **raw.txt**.
-Ένα αρχείο **raw.txt** περιέχει μια κεφαλίδα:
+Η κλάση **DataFile** παίρνει ως όρισμα τον αριθμό των στοιχείων και δημιουργεί ένα αρχείο **<αριθμός_στοιχείων>.txt**.
+Ένα αρχείο **<αριθμός_στοιχείων>.txt** περιέχει μια κεφαλίδα και τα στοιχεία:
 		
-	NumberOfElements	Dimensions	//Header
-	.element1(x1, y1, ... n1)		//Elements..
-	.element2(x2, y2, ... n2)
+	NumberOfElements	NumberOfDimensions	//HEADER
+	.ELEMENT_1 (X1, Y1, ... N1)			//ELEMENTS..
+	.ELEMENT_2 (X2, Y2, ... N2)
 	.
 	.
-	.
+	.ELEMENT_K (XK, YK, ... NK)
 	
-	
-Έχω δημιουργήσει τέσσερα (4) είδη κλάσεων **DataFile** στο **ds.bplus.data** κατάλογο. Είναι τα ακόλουθα:
-
-**UniformDataFile.java**: Τα στοιχεία είναι **Random**, μοντελοποιούν συντεταγμένες (στα όρια των ΗΠΑ) με δεκαδική ακρίβεια **6** ψηφίων.
+Η κλάση περιέχει μεθόδους που παράγουν δισδιάστατα στοιχεία με ψευδοτυχαίο ( **Math.Random()** ) τρόπο και μοντελοποιούν συντεταγμένες
+(στα όρια των ΗΠΑ) με δεκαδική ακρίβεια **6** ψηφίων.
 
 	DecimalFormat df  = new DecimalFormat("#.######");
-	// *United States of America* 
-	private final double lat_max = 48.682856;	//maximum latitude
-	private final double lat_min = 25.712085;	//minimum latitude
-	private final double long_max = -68.275846;	//maximum longitude
-	private final double long_min = -124.874623;	//minimum longitude
+	// *U.S.A.* 
+	private final double lat_max = 48.682856;	//ΜAX LAT
+	private final double lat_min = 25.712085;	//MIN LAT
+	private final double long_max = -68.275846;	//MAX LONG
+	private final double long_min = -124.874623;	//MAX LONG
 	
-και ακολουθούν ομοιόμορφη κατανομή. Η κατηγορία της κλάσης είναι 
+Τα στοιχεία αυτά κατανέμονται στο χώρο, είτε **ομοιόμορφα** είτε ομαδοποιημένα σε **clusters**.
 	
-	private String category = "uniform";
+	private String category = "uniform"; //uniform, cluster		
 		
+Τέλος η κλάση διαχειρίζεται και αρχεία **.csv** που περιέχουν πραγματικά στοιχεία δύο διαστάσεων. **(AIS)**
 		
-**GaussianDataFile.java**: Είναι ακριβώς όπως η προηγούμενη, με τη διαφορά ότι τα στοιχεία ακολουθούν την κανονική κατανομή.		
-		
-	private String category = "gaussian";
+	private String category = "ais";
 	
-**ClusterDataFile.java**: Τα στοιχεία αποθηκεύονται ομοιόμορφα γύρω από **N** στοιχεία αναφοράς **(x,y)**.
-Τα στοιχεία αναφοράς παράγονται ψευδοτυχαία ακολουθώντας ομοιόμορφη κατανομή και τα στοιχεία προς αποθήκευση παράγονται σε μέγιστη απόσταση **σ** από κάθε στοιχείο αναφοράς.
-Το καινούργιο **lowerBound** και **upperBound** για κάθε διάσταση που αποτελούν τα όρια για την παραγωγή των στοιχείων υπολογίζονται:
-	
-	//Βρίσκω πρώτα το εύρος σε κάθε διάσταση.
-	rangeX = Xmax - Xmin  
-	rangeY = Yman - Ymin
-	
-	//Υπολογίζω τις αποστάσεις για το σημείο αναφοράς.
-	
-	//για το Χ
-	lowerBound[0] = x_ref - (rangeX*s)/100;
-	upperbound[0] = x_ref + (rangeX*s)/100;
-	
-	//για το y
-	lowerBound[1] = y_ref - (rangeY*s)/100;
-	upperBound[1] = y_ref + (rangeY*s)/100;
-	
-όπου **(x_ref,y_ref)** το σημείο αναφοράς και **s** η απόσταση σε ποσοστό % εκατέρωθεν του σημείου αυτού.
-	
-	private String category = "cluster";
-	
-**RealDataFile.java**: Η κλάση αυτή διαβάζει ένα αρχείο .csv με πραγματικά δεδομένα, απομονώνει τα **longitude** και **latitude** και τα αποθηκεύει σε αρχείο **raw**. Ο αριθμός των γραμμών που διαβάζει από το αρχείο .csv, και εν τέλει αποθηκεύει σε ένα αρχείο **raw** είναι ίσος με τον αριθμό που παίρνει σαν όρισμα στον constructor της, η κλάση **RealDataFile**.
-	
-	private String category = "real";
+ 
 
-Προκειμένου να χρησιμοποιήσω κάποια από τις παραπάνω κλάσεις, την φορτώνω στην κλάση **DataFile** ( διορθώνοντας στα σημεία του **package**, και ονομασίες κλάσεων και constructor ) προκειμένου η **DataFile.java** να μπορεί να τρέξει.  
-	
-Παράδειγμα εκτέλεσης 100 χιλιάδων στοιχείων:	
 
-	DataFile df = new DataFile(100000,"");
-		
-δίνει αποτέλεσμα
 
-	RangeQuery/DataDirectory/category/raw/100K.txt
 
-Η κλάση χειρίζεται και την περίπτωση δημιουργίας πολλαπλών αρχείων **raw** ίδιου αριθμού στοιχείων.
-		
-	RangeQuery/DataDirectory/category/raw/100K_1.txt //suffix = "1";
-	RangeQuery/DataDirectory/category/raw/100K_2.txt //..
-	RangeQuery/DataDirectory/category/raw/100K_3.txt //..
-	RangeQuery/DataDirectory/category/raw/100K_4.txt //..
-	RangeQuery/DataDirectory/category/raw/100K_5.txt //..
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 	
 
 # **IndexingFile.java**: 
