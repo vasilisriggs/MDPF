@@ -1,5 +1,4 @@
 package ds.bplus.mdpf;
-
 import static java.lang.Long.MAX_VALUE;
 
 import java.io.BufferedWriter;
@@ -14,7 +13,7 @@ import java.util.Random;
 
 import ds.bplus.bptree.*;
 import ds.bplus.object.*;
-
+import ds.bplus.util.BTMath;
 import ds.bplus.util.InvalidBTreeStateException;
 /**
  * This class provides functions for a B+ Tree
@@ -22,160 +21,33 @@ import ds.bplus.util.InvalidBTreeStateException;
  *
  */
 public class TreeMods{
-	
 	private String directory = "DataDirectory/";
 	private String category; //cluser,gaussian,real,uniform
 	private String treeFolder = "bins/";
-	private String statFolder = "statistics/";
-	private String queryFolder = "queries";
-	
-	private String statPathName;
 	private String treePathName;
-	
-	private String filenameC;
-	private String filenameZ;
-	
+	private String fileNameC;
+	private String fileNameZ;
 	private TreeFile tf;
+	private IndexingFile inf;
 	private double[] mins;
 	private double[] maxs;
 	private int pages;
+	private QueryComponentsObject qcoC;
+	private QueryComponentsObject qcoZ;
+	private BPlusTreePerformanceCounter BPerfC;
+	private BPlusTreePerformanceCounter BPerfZ;
 	private BPlusTree bpc;
 	private BPlusTree bpz;
 	private double[] steps;
 	private int rbits;
+	private int n = 2;
 	private DecimalFormat df  = new DecimalFormat("#.######");
-	private TimeQuarters tqs;
 	private boolean isMultiple;
-	
 	public TreeMods(TreeFile tf) {
-		
-		category = tf.getIndexingObject().getIndexingCategory();
-		isMultiple = tf.getIndexingObject().getDataObject().getDataMultiple();
-		statPathName = directory+category+statFolder;
-		treePathName = directory+category+treeFolder;
-		
 		this.tf = tf;
-		this.bpc = tf.getBTreeC();
-		this.bpz = tf.getBTreeZ();
-		
-		this.filenameC = tf.getFileNameC(); 
-		this.filenameZ = tf.getFileNameZ();
-		
-		this.pages = tf.getPages();
-		this.rbits = (int)Math.ceil(Math.log10(pages)/Math.log10(2));
-		
-		this.steps = new double[2];
-		this.mins = new double[2];
-		this.maxs = new double[2];
-		
-		mins[0] = tf.getMinX();
-		mins[1] = tf.getMinY();
-		maxs[0] = tf.getMaxX();
-		maxs[1] = tf.getMaxY();
-		
-		for(int i=0;i<steps.length;i++){
-			steps[i] = Double.parseDouble(df.format((maxs[i]-mins[i])/pages));
-		}	
+		this.inf = this.tf.getIndexingObject();
+		setParams();
 	}	
-	
-	public void getLeafElements() throws IOException, InvalidBTreeStateException{
-		 
-		String prefix = "LeafElements";
-		String filefix;
-		String[] line = filenameC.split("_");
-		if(isMultiple){
-			filefix = line[1]+"_"+line[2]+"_"+line[3]+"_"+line[4]+"_"+line[5];
-		}else {
-			filefix = line[1]+"_"+line[2]+"_"+line[4];
-		}
-		
-		String filenames = prefix+"-"+filefix;	
-		String writeFileC = statPathName+filenames+"_C.txt";		
-		String writeFileZ = statPathName+filenames+"_Z.txt";
-		
-		File fc = new File(writeFileC);
-		File fz = new File(writeFileZ);
-	
-		if(fc.exists()||fz.exists()){
-			System.out.println(filenames+"_C.txt or "+filenames+"_Z.txt already exists");
-			return;
-		}
-		
-		BufferedWriter writerC = new BufferedWriter(new FileWriter(writeFileC, true));
-
-		long lower=0;
-		long upper=0;
-		long maxIndex = (pages*pages)-1;
-		SearchResult sr;
-		int cnt = 1;
-		String chars = "";
-		int maxChars = 3;
-		int capacity = 0;
-		TreeLeaf leaf;
-		writerC.append("Leaf-Index	NumberOfIndexes	Range");
-		while(upper<maxIndex) {
-			writerC.newLine();
-			sr = bpc.searchKey(lower, true);
-			while(!sr.isFound()) {
-				lower++; // go next index
-				if(lower>maxIndex) {
-					break;
-				}
-				sr = bpc.searchKey(lower, true);
-			}
-			if(lower>maxIndex) {
-				break;
-			}
-			leaf = sr.getLeaf();
-			leaf.printNode();
-			upper = leaf.getLastKey();
-			capacity = leaf.getCurrentCapacity();
-			chars = String.valueOf(cnt);
-			while(chars.length()<maxChars) {
-				chars = "0"+chars;
-			}
-			writerC.append(chars+" "+String.valueOf(capacity)+" "+String.valueOf(lower)+"-"+String.valueOf(upper));
-			lower = upper+1; // go next range
-			cnt++; 
-		}
-		writerC.close();
-		System.out.println(filenames+"_C.txt was created successfully.");
-		
-		BufferedWriter writerZ = new BufferedWriter(new FileWriter(writeFileZ, true));
-		
-		writerZ.append("Leaf-Index	NumberOfIndexes	Range");
-		lower = 0;
-		upper = 0;
-		cnt = 1;
-		while(upper<maxIndex) {
-			writerZ.newLine();
-			sr = bpz.searchKey(lower, true);
-			while(!sr.isFound()) {
-				lower++; // go next index
-				if(lower>maxIndex) {
-					break;
-				}
-				sr = bpz.searchKey(lower, true);
-			}
-			if(lower>maxIndex) {
-				break;
-			}
-			leaf = sr.getLeaf();
-			leaf.printNode();
-			upper = leaf.getLastKey();
-			capacity = leaf.getCurrentCapacity();
-			chars = String.valueOf(cnt);
-			while(chars.length()<maxChars) {
-				chars = "0"+chars;
-			}
-			writerZ.append(chars+" "+String.valueOf(capacity)+" "+String.valueOf(lower)+"-"+String.valueOf(upper));
-			lower = upper+1; // go next range
-			cnt++; 
-		}
-		writerZ.close();
-		System.out.println(filenames+"_Z.txt was created successfully.");
-	}
-
 	/**	This function realizes a range query. The rangeSearch on the .bin file consists of a range between the
 	 * minimum and the maximum index of each Curve-List. rangeSearch([minIndex,maxIndex]). Returns all values.
 	 * Refinement happens on the RangeResult object.
@@ -185,231 +57,159 @@ public class TreeMods{
 	 * @throws InvalidBTreeStateException 
 	 * @throws IOException 
 	 */
-	public QueryComponentsObject rangeQuery(double[] lb, double[] ub) throws IOException, InvalidBTreeStateException{
-		
-		
-		ArrayList<Long> longListZ = resultQuery(lb,ub,"Z");
-		
-		int leafReadsC = 0;
-		int leafReadsZ = 0;
-		int falsePosC = 0;
-		int falsePosZ = 0;
-		
-		int[] rangeIOres;
-		
-		boolean nonDupes = false;	
-		long startC = System.currentTimeMillis();
-		ArrayList<Long> longListC = resultQuery(lb,ub,"C");
-		
-		long minIndex = getMinIndexFromList(longListC);
-		long maxIndex = getMaxIndexFromList(longListC);
-		RangeResult rrC = bpc.rangeSearch(minIndex, maxIndex, nonDupes); // using getMinIndexFromList() and --Max--() inside rangeSearch() will make it take more time.
-		falsePosC = rrC.getQueryResult().size();
-		refineQuery(lb,ub,rrC);
-		falsePosC = falsePosC - rrC.getQueryResult().size();
-		long endC = System.currentTimeMillis();
-		long totalC = endC - startC;
-		
+	public void rangeQuery(double[] lb, double[] ub) throws IOException, InvalidBTreeStateException{
+		// B+ TREE C CURVE METHOD
 		bpc.getPerformanceClass().resetAllMetrics();
-		rangeIOres = bpc.getPerformanceClass().rangeIO(minIndex, maxIndex, nonDupes, false);
-		leafReadsC = rangeIOres[4]; // getInterminentLeafPageReads();
-		
-		minIndex = getMinIndexFromList(longListZ);
-		maxIndex = getMaxIndexFromList(longListZ);
-		
-		long startZ = System.currentTimeMillis();
-		RangeResult rrZ = bpz.rangeSearch(minIndex, maxIndex, nonDupes);
-		falsePosZ = rrZ.getQueryResult().size();
-		refineQuery(lb,ub,rrZ);
-		falsePosZ = falsePosZ - rrZ.getQueryResult().size();
-		long endZ = System.currentTimeMillis();
-		long totalZ = endZ - startZ;
-		
+		ArrayList<Long> listC = resultQuery(lb,ub,"C");
+		if(listC!=null) {
+			RangeResult rrC = bpc.rangeSearch(BTMath.getMinIndexFromList(listC), BTMath.getMaxIndexFromList(listC), false);
+			if(rrC.getQueryResult()!=null) {
+				bpc.getPerformanceClass().incrementTotalRecords(rrC.getQueryResult().size());
+				bpc.getPerformanceClass().incrementFalsePositives(refineQuery(lb,ub,rrC));
+			}
+		}
+		// B+ TREE Z CURVE METHOD
 		bpz.getPerformanceClass().resetAllMetrics();
-		rangeIOres = bpz.getPerformanceClass().rangeIO(minIndex, maxIndex, nonDupes, false);
-		leafReadsZ = rangeIOres[4]; // getInterminentLeafPageReads();
+		ArrayList<Long> listZ = resultQuery(lb,ub,"Z");
+		if(listZ!=null) {
+			RangeResult rrZ = bpz.rangeSearch(BTMath.getMinIndexFromList(listZ), BTMath.getMaxIndexFromList(listZ), false);
+			if(rrZ.getQueryResult()!=null) {
+				bpz.getPerformanceClass().incrementTotalRecords(rrZ.getQueryResult().size());
+				bpz.getPerformanceClass().incrementFalsePositives(refineQuery(lb,ub,rrZ));
+			}
+		}	
 		
-		QueryComponentsObject qco  = new QueryComponentsObject(totalC,totalZ,rrC.getQueryResult().size(),rrZ.getQueryResult().size(), falsePosC, falsePosZ, leafReadsC, leafReadsZ);
+		getQueryStatistics();
+ 	}		
+	public void fractionsQuery(double[] lb, double[] ub) throws IOException, InvalidBTreeStateException {			
+		// B+ TREE C CURVE METHOD
 		bpc.getPerformanceClass().resetAllMetrics();
-		bpz.getPerformanceClass().resetAllMetrics();
-		
-		System.out.println(falsePosC);
-		System.out.println(falsePosZ);
-		
-		return qco;	
- 	}	
-	public QueryComponentsObject fractionsQuery(double[] lb, double[] ub) throws IOException, InvalidBTreeStateException {
-		ArrayList<Long> longListC = resultQuery(lb,ub,"C");
-		ArrayList<Long> longListZ = resultQuery(lb,ub,"Z");
-		
-		boolean nonDupes = false;
-		
-		int leafReadsC = 0;
-		int leafReadsZ = 0;
-		int falsePosC = 0;
-		int falsePosZ = 0;
-		
-		int[] rangeIOres;
-		
-		int totalSizeC = 0;
-		int totalSizeZ = 0;
-		
-		long startC = 0;
-		long startZ = 0;
-		long endC = 0;
-		long endZ = 0;
-		long totalC = 0;
-		long totalZ = 0;
-		
-		RangeResult rrC;
-		RangeResult rrZ;
-		
-		for(int i=0;i<longListC.size();i++) {
-			startC = System.currentTimeMillis();
-			rrC = bpc.rangeSearch(longListC.get(i), longListC.get(i), nonDupes);
-			falsePosC = falsePosC + rrC.getQueryResult().size();
-			refineQuery(lb,ub,rrC);
-			falsePosC = falsePosC - rrC.getQueryResult().size();
-			endC = System.currentTimeMillis();
-			totalC = totalC + (endC-startC);
-			totalSizeC = totalSizeC + rrC.getQueryResult().size();
-			
-			rangeIOres = bpc.getPerformanceClass().rangeIO(longListC.get(i), longListC.get(i), nonDupes, false);
-			leafReadsC = leafReadsC + rangeIOres[4];
-			
-			bpc.getPerformanceClass().resetAllMetrics();
+		ArrayList<Long> listC = resultQuery(lb,ub,"C");
+		if(listC!=null) {
+			SearchResult srC;
+			for(int i=0;i<listC.size();i++) {
+				srC = bpc.searchKey(listC.get(i), false);
+				if(srC.getValues()!=null) {
+					bpc.getPerformanceClass().incrementTotalRecords(srC.getValues().size());
+					bpc.getPerformanceClass().incrementFalsePositives(refineQuerySearch(lb,ub,srC));
+				}else {
+					
+				}
+			}
 		}
 		
 		
-		for(int i=0;i<longListZ.size();i++) {
-			startZ = System.currentTimeMillis();
-			rrZ = bpz.rangeSearch(longListZ.get(i), longListZ.get(i), nonDupes);
-			falsePosZ = falsePosZ + rrZ.getQueryResult().size();
-			refineQuery(lb,ub,rrZ);
-			falsePosZ = falsePosZ - rrZ.getQueryResult().size();
-			endZ = System.currentTimeMillis();
-			totalZ = totalZ + (endZ-startZ);
-			totalSizeZ = totalSizeZ + rrZ.getQueryResult().size();
-			
-			rangeIOres = bpz.getPerformanceClass().rangeIO(longListZ.get(i), longListZ.get(i), nonDupes, false);
-			leafReadsZ = leafReadsZ + rangeIOres[4];
-			
-			bpz.getPerformanceClass().resetAllMetrics();
+		// B+ TREE Z CURVE METHOD
+		bpz.getPerformanceClass().resetAllMetrics();
+		ArrayList<Long> listZ = resultQuery(lb,ub,"Z");
+		if(listZ!=null) {
+			SearchResult srZ;
+			for(int i=0;i<listZ.size();i++) {
+				srZ = bpz.searchKey(listZ.get(i), false);
+				if(srZ.getValues()!=null) {
+					bpz.getPerformanceClass().incrementTotalRecords(srZ.getValues().size());
+					bpz.getPerformanceClass().incrementFalsePositives(refineQuerySearch(lb,ub,srZ));
+				}
+				
+			}
 		}
 		
-		QueryComponentsObject qco = new QueryComponentsObject(totalC, totalZ, totalSizeC, totalSizeZ, falsePosC, falsePosZ, leafReadsC, leafReadsZ);
-		bpc.getPerformanceClass().resetAllMetrics();
-		bpz.getPerformanceClass().resetAllMetrics();
-		return qco;
+		getQueryStatistics();
+		
 	}
 	
-	public QueryComponentsObject rangeFractionsQuery(double[] lb, double[] ub) throws IOException, InvalidBTreeStateException {
-		
-		int leafReadsC = 0;
-		int leafReadsZ = 0;
-		int falsePosC = 0;
-		int falsePosZ = 0;
-		
-		boolean nonDupes = false;
-		
-		int[] rangeIOres;
-		
-		long start;
-		long end;
-		long totalC = 0;
-		long totalZ = 0;
-		
-		RangeResult rrC;
-		RangeResult rrZ;
-		
-		int totalSizeC = 0;
-		int totalSizeZ = 0;
-		
-		long min = 0;
-		long max = 0;	
-		
-
-		
-		start = System.currentTimeMillis();
-		
-		ArrayList<Long> longListC = resultQuery(lb,ub,"C");
-		for(int i=0;i<longListC.size();i++) {
-			System.out.println(longListC.get(i));
-		}
-		listSort(longListC);
-		for(int i=0;i<longListC.size();i++) {
-			System.out.println(longListC.get(i));
-		}
-		
-		min = longListC.get(0);
-		max = longListC.get(0);
-		
-		for(int i=1;i<longListC.size();i++) {
-			if((longListC.get(i)<min)||(longListC.get(i)-max>1)) {
-				rrC = bpc.rangeSearch(min, max, nonDupes);		
-				falsePosC = falsePosC + rrC.getQueryResult().size();
-				refineQuery(lb,ub,rrC);
-				falsePosC = falsePosC - rrC.getQueryResult().size();
-				totalSizeC = totalSizeC + rrC.getQueryResult().size();
-				rangeIOres = bpc.getPerformanceClass().rangeIO(min, max, nonDupes, false);
-				leafReadsC = leafReadsC + rangeIOres[4];
-				min = longListC.get(i);
-				max = longListC.get(i);
+	public void rangeFractionsQuery(double[] lb, double[] ub) throws IOException, InvalidBTreeStateException {
+		// B+ TREE C CURVING METHOD
+		bpc.getPerformanceClass().resetAllMetrics();
+		RangeResult rrC;	
+		SearchResult srC;
+		ArrayList<Long> listC = resultQuery(lb,ub,"C");
+		if(listC!=null) {
+			BTMath.listSort(listC,pages);
+			long min = listC.get(0);
+			long max = listC.get(0);
+			for(int i=1;i<listC.size();i++) { // parsing all indices that where returned
+				if(listC.get(i)-max>1) { //  if current index not consecutive with the last:
+					if(max==min) { // if the min index is the same with the max index that means that we have an index that is alone so we:
+						srC = bpc.searchKey(max, false); // we searchKey() instead of rangeSearch()
+						if(srC.getValues()!=null) {
+							bpc.getPerformanceClass().incrementTotalRecords(srC.getValues().size());
+							bpc.getPerformanceClass().incrementFalsePositives(refineQuerySearch(lb,ub,srC));
+						}		
+					}else {
+						rrC = bpc.rangeSearch(min, max, false);	
+						if(rrC.getQueryResult()!=null) {
+							bpc.getPerformanceClass().incrementTotalRecords(rrC.getQueryResult().size());
+							bpc.getPerformanceClass().incrementFalsePositives(refineQuery(lb,ub,rrC));
+						}
+					}
+					min = listC.get(i); // we move the minimum pivot to the current index
+				}
+				max = listC.get(i); // we always move the maximum pivot to the currect index
 			}
-			max = longListC.get(i);
-		}
-		rrC = bpc.rangeSearch(min, max, nonDupes);
-		falsePosC = falsePosC + rrC.getQueryResult().size();
-		refineQuery(lb,ub,rrC);
-		falsePosC = falsePosC  - rrC.getQueryResult().size();
-		totalSizeC = totalSizeC + rrC.getQueryResult().size();
-		rangeIOres = bpc.getPerformanceClass().rangeIO(min, max, nonDupes, false);
-		leafReadsC = leafReadsC + rangeIOres[4];
-		
-		end = System.currentTimeMillis();
-		totalC = end-start;
-		
-		start  = System.currentTimeMillis();
-		ArrayList<Long> longListZ = resultQuery(lb,ub,"Z");
-		listSort(longListZ);
-		min = longListZ.get(0);
-		max = longListZ.get(0);
-		for(int i=1;i<longListZ.size();i++) {
-			if((longListZ.get(i)<min)||(longListZ.get(i)-max>1)) {	
+			if(max==min) {
+				srC = bpc.searchKey(max, false);
+				if(srC.getValues()!=null) {
+					bpc.getPerformanceClass().incrementTotalRecords(srC.getValues().size());
+					bpc.getPerformanceClass().incrementFalsePositives(refineQuerySearch(lb,ub,srC));
+				}
 				
-				rrZ = bpz.rangeSearch(min, max, nonDupes);
-				falsePosZ = falsePosZ + rrZ.getQueryResult().size();
-				refineQuery(lb,ub,rrZ);
-				falsePosZ = falsePosZ  - rrZ.getQueryResult().size();
-				
-				
-				totalSizeZ = totalSizeZ + rrZ.getQueryResult().size();
-				rangeIOres = bpz.getPerformanceClass().rangeIO(min, max, nonDupes, false);
-				leafReadsZ = leafReadsZ + rangeIOres[4];
-				min = longListZ.get(i);
-				max = longListZ.get(i);		
+			}else {
+				rrC = bpc.rangeSearch(min, max, false);
+				if(rrC.getQueryResult()!=null) {
+					bpc.getPerformanceClass().incrementTotalRecords(rrC.getQueryResult().size());
+					bpc.getPerformanceClass().incrementFalsePositives(refineQuery(lb,ub,rrC));
+				}
 			}
-			max = longListZ.get(i);
 		}
 		
-		rrZ = bpz.rangeSearch(min, max, nonDupes);
-		falsePosZ = falsePosZ + rrZ.getQueryResult().size();
-		refineQuery(lb,ub,rrZ);
-		falsePosZ = falsePosZ  - rrZ.getQueryResult().size();
+		//B+ TREE Z CURVING METHOD
+		bpz.getPerformanceClass().resetAllMetrics();
+		RangeResult rrZ;	
+		SearchResult srZ;
+		ArrayList<Long> listZ = resultQuery(lb,ub,"Z");
+		if(listZ!=null) {
+			BTMath.listSort(listZ,pages);
+			long min = listZ.get(0);
+			long max = listZ.get(0);
+			for(int i=1;i<listZ.size();i++) { // parsing all indices that where returned
+				if(listZ.get(i)-max>1) { //  if current index not consecutive with the last:
+					if(max==min) { // if the min index is the same with the max index that means that we have an index that is alone so we:
+						srZ = bpz.searchKey(max, false); // we searchKey() instead of rangeSearch()
+						if(srZ.getValues()!=null) {
+							bpz.getPerformanceClass().incrementTotalRecords(srZ.getValues().size());
+							bpz.getPerformanceClass().incrementFalsePositives(refineQuerySearch(lb,ub,srZ));
+						}		
+					}else {
+						rrZ = bpz.rangeSearch(min, max, false);	
+						if(rrZ.getQueryResult()!=null) {
+							bpz.getPerformanceClass().incrementTotalRecords(rrZ.getQueryResult().size());
+							bpz.getPerformanceClass().incrementFalsePositives(refineQuery(lb,ub,rrZ));
+						}
+					}
+					min = listZ.get(i); // we move the minimum pivot to the current index
+				}
+				max = listZ.get(i); // we always move the maximum pivot to the currect index
+			}
+			if(max==min) {
+				srZ = bpz.searchKey(max, false);
+				if(srZ.getValues()!=null) {
+					bpz.getPerformanceClass().incrementTotalRecords(srZ.getValues().size());
+					bpz.getPerformanceClass().incrementFalsePositives(refineQuerySearch(lb,ub,srZ));
+				}
+				
+			}else {
+				rrZ = bpz.rangeSearch(min, max, false);
+				if(rrZ.getQueryResult()!=null) {
+					bpz.getPerformanceClass().incrementTotalRecords(rrZ.getQueryResult().size());
+					bpz.getPerformanceClass().incrementFalsePositives(refineQuery(lb,ub,rrZ));
+				}
+			}
+		}		
 		
-		totalZ = totalZ + (end-start);
-		totalSizeZ = totalSizeZ + rrZ.getQueryResult().size();
-		rangeIOres = bpz.getPerformanceClass().rangeIO(min, max, nonDupes, false);
-		leafReadsZ = leafReadsZ + rangeIOres[4];
-		
-		end = System.currentTimeMillis();
-		totalZ = end-start;
-		
-		QueryComponentsObject qco = new QueryComponentsObject(totalC, totalZ, totalSizeC, totalSizeZ, falsePosC, falsePosZ, leafReadsC, leafReadsZ);
-		return qco;	
+		getQueryStatistics();
 	}
-	
-	private void refineQuery(double[] lb, double[] ub, RangeResult rr) {
+	private int refineQuery(double[] lb, double[] ub, RangeResult rr) {
 		
 		BigDecimal xMin = BigDecimal.valueOf(lb[0]);
 		BigDecimal yMin = BigDecimal.valueOf(lb[1]);
@@ -417,6 +217,7 @@ public class TreeMods{
 		BigDecimal xMax = BigDecimal.valueOf(ub[0]);
 		BigDecimal yMax = BigDecimal.valueOf(ub[1]);
 		
+		int size = rr.getQueryResult().size();
 		String line;
 		String[] arr = new String[2];
 		
@@ -434,86 +235,35 @@ public class TreeMods{
 				i--;
 			}
 		}
+		return(size - rr.getQueryResult().size());
 	}
-	
-	/**
-	 * Creates all possible patterns for a given number of pages.
-	 * @throws IOException
-	 */
-	public void createPatterns() throws IOException {
-		int maxN = pages;
-		int minN = 2;
+	private int refineQuerySearch(double[] lb, double[] ub, SearchResult sr) {
 		
-		for(int i=0;i<this.rbits;i++) {
-			createPatternPoints(maxN,minN);
-			maxN = maxN/2;
-			minN = minN*2;
-			if(maxN==1||minN>pages) {
-				return;
+		BigDecimal xMin = BigDecimal.valueOf(lb[0]);
+		BigDecimal yMin = BigDecimal.valueOf(lb[1]);
+		
+		BigDecimal xMax = BigDecimal.valueOf(ub[0]);
+		BigDecimal yMax = BigDecimal.valueOf(ub[1]);
+		
+		int size = sr.getValues().size();
+		String line;
+		String[] arr = new String[2];
+		
+		BigDecimal[] bg = new BigDecimal[2];
+		
+		for(int i=0;i<sr.getValues().size();i++) {
+			
+			line = sr.getValues().get(i);
+			arr = line.split(",");
+			bg[0] = BigDecimal.valueOf(Double.parseDouble(arr[0])); // x value
+			bg[1] = BigDecimal.valueOf(Double.parseDouble(arr[1])); // y value
+			
+			if(!(((bg[0].compareTo(xMin)>=0)&&(bg[0].compareTo(xMax)<=0))&&((bg[1].compareTo(yMin)>=0)&&(bg[1].compareTo(yMax)<=0)))){
+				sr.getValues().remove(i);
+				i--;
 			}
 		}
-		
-	}
-	/**
-	 * Given a Query Pattern, I generate values to match the dimensions of the pattern.
-	 * @param maxN is the X Dimension of the pattern
-	 * @param minN is the Y Dimension of the pattern
-	 * @throws IOException
-	 */
-	private void createPatternPoints(int maxN, int minN) throws IOException {
-		Random r1 = new Random();
-		Random r2 = new Random();
-		int numberOfValues = 100;
-		String queryFile = directory+category+queryFolder+"queryPattern_"+String.valueOf(maxN)+"X"+String.valueOf(minN)+".txt";
-		File f = new File(queryFile);
-		if(f.exists()) {
-			System.out.println(queryFile+" already exists. Returning.");
-			return;
-		}
-		
-		BufferedWriter writer = new BufferedWriter(new FileWriter(queryFile, true));
-		
-		double valueX = 0.0;
-		double valueY = 0.0;
-		
-		for(int i=0;i<numberOfValues;i++) {
-			valueX = mins[0] + r1.nextDouble()*(maxs[0] - mins[0]);
-			valueX = Double.parseDouble(df.format(valueX));
-			while(!(((valueX+(steps[0]*maxN)>maxs[0])&&(valueX+(steps[0]*(maxN-1))<=maxs[0]))||(valueX+(steps[0]*maxN)<=maxs[0]))){
-				valueX = mins[0] + r1.nextDouble()*(maxs[0] - mins[0]);
-				valueX = Double.parseDouble(df.format(valueX));
-			}
-			valueY = mins[1] + r2.nextDouble()*(maxs[1] - mins[1]);
-			valueX = Double.parseDouble(df.format(valueX));
-			while(!(((valueY+(steps[1]*minN)>maxs[1])&&(valueY+(steps[1]*(minN-1))<=maxs[1]))||(valueY+(steps[1]*minN)<=maxs[1]))){
-				valueY = mins[1] + r2.nextDouble()*(maxs[1] - mins[1]);
-				valueY = Double.parseDouble(df.format(valueY));
-			}
-			writer.append(String.valueOf(valueX)+" "+String.valueOf(valueY));
-			writer.newLine();
-		}
-		writer.close();
-		return;
-	}
-
-	private long getMinIndexFromList(ArrayList<Long> longlist){
-		long min = MAX_VALUE;
-		for(int i=0;i<longlist.size();i++) {
-			if(longlist.get(i)<min) {
-				min = longlist.get(i);
-			}
-		}
-		return min;
-	}
-	
-	private long getMaxIndexFromList(ArrayList<Long> longlist) {
-		long max = 0;
-		for(int i=0;i<longlist.size();i++) {
-			if(longlist.get(i)>max) {
-				max = longlist.get(i);
-			}
-		}
-		return max;
+		return (size - sr.getValues().size());
 	}
 	/**
 	 * Given the bounds and the type of the space filling curve, it calculates and returns which indexes are being filled or "touched" by the bounds in the arguments.
@@ -523,6 +273,7 @@ public class TreeMods{
 	 * @return Returns a list which holds the resulted indexes for a specific curve
 	 */
 	private ArrayList<Long> resultQuery(double[] lb, double[] ub, String curve){
+		
 		if(curve!="c" && curve!="C" && curve!="z" && curve!="Z") {
 			System.out.println("Wrong Curve. Returning.");
 			return null;
@@ -553,81 +304,53 @@ public class TreeMods{
 		long maxIndex;
 		
 		minIndex = findIndex(lb,curve);
-		maxIndex = findIndex(ub,curve);
-		
+		maxIndex = findIndex(ub,curve);		
 		if(curve=="c" || curve=="C") { // breaking the indexes into the x-y decimal (of the before binary) representation.
-			minlong = revConcat(minIndex);
-			cnt = revConcat(minIndex);
-			maxlong = revConcat(maxIndex);
-			for(int i=(int)minlong[0];i<=maxlong[0];i++) { // we add every index that is between ( 2-dimensional ) the min and max.
-				for(int j=(int)minlong[1];j<=maxlong[1];j++) { // meaning that we parse the box to get every index(interleaved or concatenated) 
+			minlong = BTMath.reverseConcatenateXY(minIndex,rbits);
+			cnt = BTMath.reverseConcatenateXY(minIndex,rbits);
+			maxlong = BTMath.reverseConcatenateXY(maxIndex,rbits);
+			for(cnt[0]=minlong[0];cnt[0]<=maxlong[0];cnt[0]++) { // we add every index that is between ( 2-dimensional ) the min and max.
+				for(cnt[1]=minlong[1];cnt[1]<=maxlong[1];cnt[1]++) { // meaning that we parse the box to get every index(interleaved or concatenated)
 					longlist.add(findIndexLong(cnt,curve)); // that is inside the lowerBound and upperBound.
-					cnt[1]++;
 				}
-				cnt[1] = minlong[1];
-				cnt[0]++;
 			}		
 		}else if(curve=="z" || curve=="Z") {
-			minlong = revLeave(minIndex);
-			cnt = revLeave(minIndex);
-			maxlong = revLeave(maxIndex);
-			System.out.println(minlong[0]+" "+minlong[1]+" "+maxlong[0]+" "+maxlong[1]);
-			for(int i=(int)minlong[0];i<=maxlong[0];i++) {
-				for(int j=(int)minlong[1];j<=maxlong[1];j++) {
+			minlong = BTMath.reverseInterleaveXY(minIndex,rbits);
+			cnt = BTMath.reverseInterleaveXY(minIndex,rbits);
+			maxlong = BTMath.reverseInterleaveXY(maxIndex,rbits);
+			for(cnt[0]=minlong[0];cnt[0]<=maxlong[0];cnt[0]++) {
+				for(cnt[1]=minlong[1];cnt[1]<=maxlong[1];cnt[1]++) {
 					longlist.add(findIndexLong(cnt,curve));
-					cnt[1]++;
 				}
-				cnt[1] = minlong[1];
-				cnt[0]++;
 			}
 		}	
 		return longlist;
 	}
 	/**
 	 * Calculates on which index, the given point is for the specified curve 
-	 * @param dat represents the point ( data-set )
+	 * @param dataSet represents the point ( data-set )
 	 * @param curve is the curve we are using at the momment
 	 * @return the index that corresponds for the point and the curve
 	 */
-	public long findIndex(double[] dat, String curve) { // takes a double[] as an argument which contains a data set and returns the index 										
-		long ind = 0; //which this data set is in.
-		double temp;
-		int[] index = new int[dat.length];
-		for(int i=0;i<dat.length;i++) {
-			temp = (double)((dat[i]-mins[i])/steps[i]);
-			if(temp>=(double)pages){
-				index[i] = pages-1;
-			}else if(temp==0.0){ //has to do with negative indexing which I'm trying to defeat with this line.
-				index[i] = 0;
-			}else{
-				index[i] = (int)(Math.ceil(temp)-1);
-			}
+	public long findIndex(double[] dataSet, String curve) { // takes a double[] as an argument which contains a data set and returns the index 		
+		String[] dataString = new String[dataSet.length];
+		long index = 0; //which this data set is in.
+		int[] indexing = new int[dataSet.length];
+		String[] bins = new String[dataSet.length];
+		for(int i=0;i<dataSet.length;i++) {
+			dataString[i] = String.valueOf(BTMath.formatDouble(dataSet[i]));
+			indexing[i] = BTMath.setIndexing(dataString[i], mins[i], steps[i], indexing[i], pages);
 		}
-		String[] bins = new String[index.length];
-		for(int i=0;i<index.length;i++) {
-			bins[i] = Integer.toBinaryString(index[i]);
-			while(bins[i].length()<rbits) {
-				bins[i] = "0"+bins[i];
-			}
-		}
+		BTMath.binaryPadding(indexing, bins, rbits);
 		if(curve=="C" || curve=="c") {
-			ind = concat(bins);
+			index = Long.parseLong(BTMath.concatenateXY(bins),2);
 		}else if(curve=="Z" || curve=="z") {
-			ind = interleave(bins);
+			index = Long.parseLong(BTMath.interLeavingXY(bins, rbits, n),2);
 		}else {
 			System.out.println("Wrong curve.");
 			return 0L;
-		}
-		
-		return ind;
-	}
-	
-	private long concat(String[] bins) { // concatenate
-		String b = "";
-		for(int i=0;i<bins.length;i++) {
-			b = b+bins[i];
-		}
-		return Long.parseLong(b,2);
+		}		
+		return index;
 	}
 	/**
 	 * 
@@ -638,132 +361,56 @@ public class TreeMods{
 	private long findIndexLong(long[] index, String curve) { // same as findIndex, but here we take a long[] as an argument
 		long indexer = 0L;
 		String[] bins = new String[index.length];
+		int[] indexing = new int[index.length];
+		for(int i=0;i<index.length;i++) {
+			indexing[i] = (int)index[i];
+		}
+		BTMath.binaryPadding(indexing, bins, rbits);
 		if(curve=="c" || curve=="C") {
-			for(int i=0;i<index.length;i++) {
-				bins[i] = Integer.toBinaryString((int)index[i]);
-				while(bins[i].length()<rbits) {
-					bins[i] = "0"+bins[i];
-				}
-			}
-			indexer = concat(bins);
+			indexer = Long.parseLong(BTMath.concatenateXY(bins),2);
 		}else if(curve=="z" || curve=="Z") {
-			for(int i=0;i<index.length;i++) {
-				bins[i] = Integer.toBinaryString((int)index[i]);
-				while(bins[i].length()<rbits) {
-					bins[i] = "0"+bins[i];
-				}
-			}
-			indexer = interleave(bins);
+			indexer = Long.parseLong(BTMath.interLeavingXY(bins, rbits, n),2);
 		}
 		return indexer;
-	}
-	/**
-	 * Helpful function for rangeQuery - Reverse Concatenation
-	 * @param index index to be dissolved into the initial 2-point index parts
-	 * @return
-	 */
-	private long[] revConcat(long index) { // reverse concatenate
-		String[] bins = new String[2];
-		long[] parts = new long[2];
-		String b;
-		b = Integer.toBinaryString((int)index);
-		while(b.length()<rbits*2) {
-			b = "0"+b;
-		}
-		bins[0] = b.substring(0, rbits);
-		bins[1] = b.substring(rbits,b.length());
-		for(int i=0;i<parts.length;i++) {
-			parts[i] = Long.parseLong(bins[i],2);
-		}
-		return parts;
-	}
-	/**
-	 * Helpful function for rangeQuery - Reverse Interleaving
-	 * @param index index to be dissolved into the initial 2-point index parts
-	 * @return
-	 */
-	private long[] revLeave(long index) { // reverse interleaving
-		String b;
-		int x = 0;
-		int y = 0;
-		String[] bits = new String[2];
-		long[] parts = new long[2];
-		String[] bins = new String[rbits*2];
-		String[] binsX = new String[rbits];
-		String[] binsY = new String[rbits];
+	}	
+	private void  setParams(){
+		category = tf.getIndexingObject().getIndexingCategory();
+		isMultiple = tf.getIndexingObject().getDataObject().getDataMultiple();
+		treePathName = directory+category+treeFolder;
 		
-		for(int i=0;i<binsY.length;i++) {
-			binsX[i] = "";
-			binsY[i] = "";
-		}
-		for(int i=0;i<bits.length;i++) {
-			bits[i] = "";
-		}
-		b = Integer.toBinaryString((int)index);
-		while(b.length()<rbits*2) {
-			b = "0"+b;
-		}
+		bpc = tf.getBTreeC();
+		bpz = tf.getBTreeZ();
 		
-		bins = b.split("(?!^)"); // split every char of b into bins[].
-		for(int i=0;i<bins.length;i++) {
-			if((i%2)==0) {
-				binsX[x] = binsX[x] + bins[i];
-				x++;
-			}else if((i%2)==1) {
-				binsY[y] = binsY[y] + bins[i];
-				y++;
-			}
-		}
-		for(int i=0;i<rbits;i++) {
-			
-			bits[0] = bits[0] + binsX[i];
-			bits[1] = bits[1] + binsY[i];
-		}
-		for(int i=0;i<bits.length;i++) {
-			
-			parts[i] = Long.parseLong(bits[i],2);
-		}
-		return parts;
+		steps = new double[2];
+		mins = new double[2];
+		maxs = new double[2];
+		
+		mins[0] = tf.getMinX();
+		mins[1] = tf.getMinY();
+		maxs[0] = tf.getMaxX();
+		maxs[1] = tf.getMaxY();
+		
+		pages = tf.getPages();
+		
+		steps = BTMath.setSteps(steps, mins, maxs, pages);
+		
+		fileNameC = tf.getFileNameC(); 
+		fileNameZ = tf.getFileNameZ();
+		
+		rbits = BTMath.getBits(pages);
 	}
-	private long interleave(String[] bins) { // interleaving
-		String b = "";
-		String[][] binswap = new String[rbits][2];
-		String[] binholder = new String[rbits];
-		for(int i=0;i<bins.length;i++){
-			binholder = bins[i].split("(?!^)");
-			for(int j=0;j<rbits;j++){
-				binswap[j][i] = binholder[j];
-			}
-		}
-		for(int i=0;i<rbits;i++){
-			for(int j=0;j<2;j++){
-				b = b + binswap[i][j];
-			}
-		}
-		return Long.parseLong(b,2);
+	private void getQueryStatistics() {
+		qcoC = new QueryComponentsObject(fileNameC, tf.getBPerfC().getTotalRecords(), tf.getBPerfC().getFalsePositives(), tf.getBPerfC().getTotalNodeReads(), 
+				tf.getBPerfC().getTotalInternalNodeReads(), tf.getBPerfC().getTotalLeafNodeReads(), tf.getBPerfC().getTotalOverflowReads(), 
+				tf.getBPerfC().getTotalSearches(), tf.getBPerfC().getTotalRangeQueries());
+		qcoZ = new QueryComponentsObject(fileNameZ, tf.getBPerfZ().getTotalRecords(), tf.getBPerfZ().getFalsePositives(), tf.getBPerfZ().getTotalNodeReads(), 
+				tf.getBPerfZ().getTotalInternalNodeReads(), tf.getBPerfZ().getTotalLeafNodeReads(), tf.getBPerfZ().getTotalOverflowReads(), 
+				tf.getBPerfZ().getTotalSearches(), tf.getBPerfZ().getTotalRangeQueries());
 	}
-	
-	private ArrayList<Long> listSort(ArrayList<Long> al){
-		int[] array = new int[pages*pages];
-		for(int i=0;i<array.length;i++) {
-			array[i] = 0;
-		}
-		for(int j=0;j<al.size();j++) {
-			array[Integer.parseInt(String.valueOf(al.get(j)))] = 1; //cant cast Long to int so I do it this way.
-		}
-		al.clear();
-		for(int k=0;k<array.length;k++) {
-			if(array[k]==1) {
-				al.add((long) k);
-			}
-		}
-		al.trimToSize();
-		return al;
-	}
-	
+	public QueryComponentsObject getQueryObjectC() 
+	{return qcoC;}
+	public QueryComponentsObject getQueryObjectZ() 
+	{return qcoZ;}
 	public TreeFile getTreeObject() 
 	{return tf;}
-	
-	public TimeQuarters getTimeQuarters()
-	{return this.tqs;}
 }
