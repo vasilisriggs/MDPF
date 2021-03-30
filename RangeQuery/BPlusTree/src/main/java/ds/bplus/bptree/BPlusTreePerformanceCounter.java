@@ -16,7 +16,6 @@ public class BPlusTreePerformanceCounter {
     private int totalLeafNodeWrites;
     private int totalOverflowWrites;
 
-
     private int totalInsertionReads;
     private int totalDeletionReads;
     private int totalSearchReads;
@@ -47,7 +46,6 @@ public class BPlusTreePerformanceCounter {
     private int totalInternalNodeSplits;
     private int totalLeafSplits;
 
-
     private int totalPages;
     private int totalOverflowPages;
     private int totalInternalNodes;
@@ -56,6 +54,9 @@ public class BPlusTreePerformanceCounter {
     private int totalInternalNodeDeletions;
     private int totalLeafNodeDeletions;
     private int totalOverflowPagesDeletions;
+    
+    private int totalRecords;
+    private int falsePositives;
 
     private boolean trackIO;
     private BPlusTree bt = null;
@@ -194,6 +195,19 @@ public class BPlusTreePerformanceCounter {
         if(trackIO) {
             pageWrites++;
         }
+    }
+    
+    
+    public void incrementTotalRecords(int records) {
+    	if(trackIO) {
+    		totalRecords = totalRecords + records;
+    	}
+    }
+    
+    public void incrementFalsePositives(int falsePos) {
+    	if(trackIO) {
+    		falsePositives = falsePositives + falsePos;
+    	}
     }
 
     public void startPageTracking() {
@@ -586,5 +600,52 @@ public class BPlusTreePerformanceCounter {
         totalInsertionWrites = 0;
         totalDeletionReads = 0;
         totalDeletionWrites = 0;
+        
+        totalRecords = 0;
+        falsePositives = 0;
     }
+    public int getTotalNodeReads() 
+    {return totalNodeReads;}
+    public int getTotalInternalNodeReads() 
+    {return totalInternalNodeReads;}
+    public int getTotalLeafNodeReads() 
+    {return totalLeafNodeReads;}
+    public int getTotalOverflowReads() 
+    {return totalOverflowReads;}   
+    
+    public int getTotalNodeWrites() 
+    {return totalNodeWrites;}
+    public int getTotalInternalNodeWrites() 
+    {return totalInternalNodeWrites;}
+    public int getTotalLeafNodeWrites() 
+    {return totalLeafNodeWrites;}
+    public int getTotalOverflowWrites() 
+    {return totalOverflowWrites;}
+    
+    public int getTotalSplits() 
+    {return totalSplits;}
+    public int getTotalRootSplits() 
+    {return totalRootSplits;}
+    public int getTotalInternalNodeSplits() 
+    {return totalInternalNodeSplits;}
+    public int getTotalLeafSplits() 
+    {return totalLeafSplits;}
+    
+    public int getTotalPages() 
+    {return totalPages;}
+    public int getTotalOverflowPages() 
+    {return totalOverflowPages;}
+    public int getTotalInternalNodes() 
+    {return totalInternalNodes;}
+    public int getTotalLeaves() 
+    {return totalLeaves;} 
+    
+    public int getTotalRecords() 
+    {return totalRecords;}
+    public int getFalsePositives() 
+    {return falsePositives;}
+    public int getTotalSearches() 
+    {return totalSearches;}
+    public int getTotalRangeQueries()
+    {return totalRangeQueries;}
 }
