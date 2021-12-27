@@ -180,8 +180,28 @@ public final class BTMath {
 		al.trimToSize();
 		return al;
 	}
-	
+	public static double avgArr(int[] arr) {
+		double total = 0;
+		for(int i=0;i<arr.length;i++) {
+			total = total + arr[i];
+		}
+		total = (total/arr.length);
+		return formatDouble(total);
+	}
+	public static double findDimensionDistance(double min, double max, int distancePercentage) {
+		return formatDouble(min + ((formatDouble(max-min)*distancePercentage)/100));
+	}
 	public void print(String string) {
 		System.out.println(String.valueOf(string));
+	}
+	public static double euclideanDistance(double xCenter,double x, double yCenter, double y) {
+		double euDistance = Math.sqrt(formatDouble(((xCenter-x)*(xCenter-x))) + formatDouble(((yCenter-y)*(yCenter-y))));
+		return formatDouble(euDistance);
+	}
+	public static boolean inClusterRange(double xCenter,double x, double yCenter, double y, double clusterRange) {
+		if(euclideanDistance(xCenter,x,yCenter,y)<=clusterRange) {
+			return true;
+		}
+		return false;
 	}
 }

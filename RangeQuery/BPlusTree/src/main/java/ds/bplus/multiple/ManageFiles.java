@@ -59,17 +59,20 @@ public class ManageFiles{
 		}
 		//generateQueryPatterns();
 		
+		rangeQueryFile = rangeQueryFile+"-"+String.valueOf(elements/1000)+"K-"+pages+"-"+pageSize+".csv";
+		rangeFractionQueryFile = rangeFractionQueryFile+"-"+String.valueOf(elements/1000)+"K-"+pages+"-"+pageSize+".csv"; 
+		fractionsQueryFile = fractionsQueryFile+"-"+String.valueOf(elements/1000)+"K-"+pages+"-"+pageSize+".csv";
 		File queryResults = new File(rangeQueryFile);
 		if(!queryResults.exists()&&toApplyQueryPattern) {
 			// start procedure.
 			BufferedWriter writerRQ = new BufferedWriter(new FileWriter(rangeQueryFile, true));
 			queryHeader(writerRQ);
 			
-			BufferedWriter writerRFQ = new BufferedWriter(new FileWriter(rangeFractionQueryFile, true));
-			queryHeader(writerRFQ);
+			//BufferedWriter writerRFQ = new BufferedWriter(new FileWriter(rangeFractionQueryFile, true));
+			//queryHeader(writerRFQ);
 			
-			BufferedWriter writerFQ = new BufferedWriter(new FileWriter(fractionsQueryFile, true));
-			queryHeader(writerFQ);
+			//BufferedWriter writerFQ = new BufferedWriter(new FileWriter(fractionsQueryFile, true));
+			//queryHeader(writerFQ);
 			
 			
 			BufferedReader br = new BufferedReader(new FileReader(queries));
@@ -85,11 +88,11 @@ public class ManageFiles{
 				writerRQ.append("QueryPattern "+pattern[0]+" "+pattern[1]+" "+pattern[2]+" "+pattern[3]);
 				writerRQ.newLine();
 				
-				writerRFQ.append("QueryPattern "+pattern[0]+" "+pattern[1]+" "+pattern[2]+" "+pattern[3]);
-				writerRFQ.newLine();
+				//writerRFQ.append("QueryPattern "+pattern[0]+" "+pattern[1]+" "+pattern[2]+" "+pattern[3]);
+				//writerRFQ.newLine();
 				
-				writerFQ.append("QueryPattern "+pattern[0]+" "+pattern[1]+" "+pattern[2]+" "+pattern[3]);
-				writerFQ.newLine();
+				//writerFQ.append("QueryPattern "+pattern[0]+" "+pattern[1]+" "+pattern[2]+" "+pattern[3]);
+				//writerFQ.newLine();
 				
 				for(int i=0;i<numberOfFiles;i++) {
 					
@@ -108,7 +111,7 @@ public class ManageFiles{
 					writerRQ.append(getQueryLine(tm[i].getQueryObjectZ(),tf[i]));		
 					writerRQ.newLine();
 					
-					tm[i].rangeFractionsQuery(lb, ub);
+					/*tm[i].rangeFractionsQuery(lb, ub);
 					writerRFQ.append(getQueryLine(tm[i].getQueryObjectC(),tf[i]));		
 					writerRFQ.newLine();
 					writerRFQ.append(getQueryLine(tm[i].getQueryObjectZ(),tf[i]));		
@@ -118,12 +121,12 @@ public class ManageFiles{
 					writerFQ.append(getQueryLine(tm[i].getQueryObjectC(),tf[i]));		
 					writerFQ.newLine();
 					writerFQ.append(getQueryLine(tm[i].getQueryObjectZ(),tf[i]));		
-					writerFQ.newLine();	
+					writerFQ.newLine();*/	
 				}
 			}
 			writerRQ.close();
-			writerRFQ.close();
-			writerFQ.close();
+			//writerRFQ.close();
+			//writerFQ.close();
 			br.close();
 		}	
 	}
