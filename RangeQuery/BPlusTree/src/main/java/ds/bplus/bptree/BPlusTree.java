@@ -11,7 +11,8 @@ import java.util.LinkedList;
 import java.util.stream.Collectors;
 
 public class BPlusTree {
-
+	
+	private String curveMethod;
     private TreeNode root;
     private TreeNode aChild;
     private RandomAccessFile treeFile;
@@ -612,10 +613,7 @@ public class BPlusTree {
         		i = sMax.getIndex()-1;
         	}else {
         		i = sMax.getIndex();
-        	}
-            System.out.println("maxKey is "+maxKey);
-            System.out.println("Index is "+i);
-            
+        	}            
             while(i >= 0 && sMax.getLeaf().getKeyAt(i) >= minKey) {
             	
                 rangeQueryResult.getQueryResult().
@@ -2441,8 +2439,12 @@ public class BPlusTree {
         }
         return(s);
     }
+    public void setCurveMethod(String curveMethod) {
+    	this.curveMethod = curveMethod;
+    }
+    public String getCurveMethod() 
+    {return curveMethod;}
 
-
+    
     private enum Rank {Pred, Succ, PlusOne, Exact}
-
 }

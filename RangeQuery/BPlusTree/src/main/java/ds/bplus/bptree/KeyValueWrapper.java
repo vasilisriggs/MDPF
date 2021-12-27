@@ -13,7 +13,7 @@ public class KeyValueWrapper {
      * This is the only constructor... as we only
      * need to set them
      * @param key the key of (K, V) pair
-     * @param value the value of the (K, V) pair
+     * @param value the value of (K, V) pair
      */
     public KeyValueWrapper(long key, String value) {
         this.key = key;

@@ -36,7 +36,8 @@ public class BPlusConfiguration {
     }
 
     /**
-     * Overloaded constructor allows page size adjustments
+    -+
+     -+** Overloaded constructor allows page size adjustments
      *
      * @param pageSize page size (in bytes)
      */
@@ -201,7 +202,6 @@ public class BPlusConfiguration {
     public int getLookupOverflowHeaderSize() {
         return (lookupOverflowHeaderSize);
     }
-
     public void printConfiguration() {
         System.out.println("\n\nPrinting B+ Tree configuration\n");
         System.out.println("Page size: " + pageSize + " (in bytes)");
