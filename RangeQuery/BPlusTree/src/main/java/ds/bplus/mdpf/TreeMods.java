@@ -92,8 +92,6 @@ public class TreeMods{
 				if(srC.getValues()!=null) {
 					bpc.getPerformanceClass().incrementTotalRecords(srC.getValues().size());
 					bpc.getPerformanceClass().incrementFalsePositives(refineQuerySearch(lb,ub,srC));
-				}else {
-					
 				}
 			}
 		}
@@ -110,7 +108,6 @@ public class TreeMods{
 					bpz.getPerformanceClass().incrementTotalRecords(srZ.getValues().size());
 					bpz.getPerformanceClass().incrementFalsePositives(refineQuerySearch(lb,ub,srZ));
 				}
-				
 			}
 		}
 		
@@ -263,7 +260,7 @@ public class TreeMods{
 				i--;
 			}
 		}
-		return (size - sr.getValues().size());
+		return (size - sr.getValues().size()); // returns the false positives.
 	}
 	/**
 	 * Given the bounds and the type of the space filling curve, it calculates and returns which indexes are being filled or "touched" by the bounds in the arguments.
@@ -295,36 +292,36 @@ public class TreeMods{
 			}
 		}
 		
-		ArrayList<Long> longlist = new ArrayList<Long>();
+		ArrayList<Long> longList = new ArrayList<Long>();
 		
-		long[] minlong = new long[2];
-		long[] maxlong = new long[2];
-		long[] cnt = new long[2];
+		long[] minLong = new long[2];
+		long[] maxLong = new long[2];
+		long[] counter = new long[2];
 		long minIndex;
 		long maxIndex;
 		
 		minIndex = findIndex(lb,curve);
 		maxIndex = findIndex(ub,curve);		
 		if(curve=="c" || curve=="C") { // breaking the indexes into the x-y decimal (of the before binary) representation.
-			minlong = BTMath.reverseConcatenateXY(minIndex,rbits);
-			cnt = BTMath.reverseConcatenateXY(minIndex,rbits);
-			maxlong = BTMath.reverseConcatenateXY(maxIndex,rbits);
-			for(cnt[0]=minlong[0];cnt[0]<=maxlong[0];cnt[0]++) { // we add every index that is between ( 2-dimensional ) the min and max.
-				for(cnt[1]=minlong[1];cnt[1]<=maxlong[1];cnt[1]++) { // meaning that we parse the box to get every index(interleaved or concatenated)
-					longlist.add(findIndexLong(cnt,curve)); // that is inside the lowerBound and upperBound.
+			minLong = BTMath.reverseConcatenateXY(minIndex,rbits);
+			counter = BTMath.reverseConcatenateXY(minIndex,rbits);
+			maxLong = BTMath.reverseConcatenateXY(maxIndex,rbits);
+			for(counter[0]=minLong[0];counter[0]<=maxLong[0];counter[0]++) { // we add every index that is between ( 2-dimensional ) the min and max.
+				for(counter[1]=minLong[1];counter[1]<=maxLong[1];counter[1]++) { // meaning that we parse the box to get every index(interleaved or concatenated)
+					longList.add(findIndexLong(counter,curve)); // that is inside the lowerBound and upperBound.
 				}
 			}		
 		}else if(curve=="z" || curve=="Z") {
-			minlong = BTMath.reverseInterleaveXY(minIndex,rbits);
-			cnt = BTMath.reverseInterleaveXY(minIndex,rbits);
-			maxlong = BTMath.reverseInterleaveXY(maxIndex,rbits);
-			for(cnt[0]=minlong[0];cnt[0]<=maxlong[0];cnt[0]++) {
-				for(cnt[1]=minlong[1];cnt[1]<=maxlong[1];cnt[1]++) {
-					longlist.add(findIndexLong(cnt,curve));
+			minLong = BTMath.reverseInterleaveXY(minIndex,rbits);
+			counter = BTMath.reverseInterleaveXY(minIndex,rbits);
+			maxLong = BTMath.reverseInterleaveXY(maxIndex,rbits);
+			for(counter[0]=minLong[0];counter[0]<=maxLong[0];counter[0]++) {
+				for(counter[1]=minLong[1];counter[1]<=maxLong[1];counter[1]++) {
+					longList.add(findIndexLong(counter,curve));
 				}
 			}
 		}	
-		return longlist;
+		return longList;
 	}
 	/**
 	 * Calculates on which index, the given point is for the specified curve 

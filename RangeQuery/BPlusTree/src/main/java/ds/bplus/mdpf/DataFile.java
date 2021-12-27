@@ -31,7 +31,7 @@ public class DataFile{
 	private String filefix;
 	private String filename;
 	private String directory = "DataDirectory/";
-	private String category = "uniform"; // cluser, uniform, ais
+	private String category = "ais"; // cluster, uniform, ais
 	private String folder = "raw/";
 	private String pathName = directory+category+"/"+folder;
 	private DecimalFormat df  = new DecimalFormat("#.######"); // 6-digit decimal formatting.
@@ -50,9 +50,9 @@ public class DataFile{
 		}else if(category=="cluster") {
 			clusterProcedure(elements, suffix);			
 		}else if(category=="ais") {
-			proccessNariFiles(nariDynamicAton,nariDynamicAtonLines,4,5);
+			//proccessNariFiles(nariDynamicAton,nariDynamicAtonLines,4,5);
 			//proccessNariFiles(nariDynamicSar,nariDynamicSarLines,4,5);
-			//proccessNariFiles(nariDynamic,nariDynamicLines,7,8);
+			proccessNariFiles(nariDynamic,nariDynamicLines,6,7);
 		}else {
 			System.out.println("Wrong category.");
 			return;
@@ -114,7 +114,6 @@ public class DataFile{
 			mins[1] = min_lat;
 			maxs[0] = max_long;
 			maxs[1] = max_lat;
-			
 			br.close();
 		}
 		return;
@@ -162,84 +161,112 @@ public class DataFile{
 		return;
 	}	
 	private void writeOnlyFileValuesCluster(int elements, String writeFile) throws IOException {
+		
 		File f = new File(writeFile);
-		int ratio = elements/clusters;
+		
 		if(!f.exists()) {
+			
 			BufferedWriter writer = new BufferedWriter(new FileWriter(writeFile, true));
-	    	
-			Random r1 = new Random();
-	    	Random r2 = new Random();
-	    	
-	    	double c_long = 0.0;
-	    	double c_lat = 0.0;
-	    	double r_long = 0.0;
-	    	double r_lat = 0.0;
-	    	//10% distance.
-	    	
-	    	double distance_long = BTMath.formatDouble((long_max-long_min)/distPer);
-	    	double distance_lat = BTMath.formatDouble((lat_max-lat_min)/distPer);
-	    	
-		    double new_long_min;
-		    double new_long_max;
-		    double new_lat_min;
-		    double new_lat_max;
-	    	
-		    writer.append(String.valueOf(elements));
+			
+			writer.append(String.valueOf(elements));
 	    	writer.append(' ');
 	    	writer.append(String.valueOf(2));
-	    	int j;
-	    	for(int i=0;i<clusters;i++) {
-	    		//generate the center of the circle.
-	    		c_long = BTMath.formatDouble(this.long_min + r1.nextDouble()*(this.long_max - this.long_min));
-	    		c_lat = BTMath.formatDouble(this.lat_min + r1.nextDouble()*(this.lat_max - this.lat_min));
-	    		
-	    		System.out.println("Center coordinates are "+c_long+", "+c_lat);
-	    		// new bounds inside the circle.
-	    	
-	    		new_long_min = BTMath.formatDouble(c_long - distance_long);
-	    		new_long_max = BTMath.formatDouble(c_long + distance_long);
-	    		new_lat_min = BTMath.formatDouble(c_lat - distance_lat);
-	    		new_lat_max = BTMath.formatDouble(c_lat + distance_lat);
-	    		
-	    		System.out.println("New relative max and mins are: "+new_long_max+" "+new_long_min+" "+new_lat_max+" "+new_lat_min);
-	    		j = 0;
-	    		while(j<ratio) {
-	    			writer.newLine();
-	    			// Generate elements around the circle.
-	    			r_long = BTMath.formatDouble(new_long_min + r1.nextDouble()*(new_long_max - new_long_min));
-	    			r_lat = BTMath.formatDouble(new_lat_min + r2.nextDouble()*(new_lat_max - new_lat_min));
-	    			// While elements out of presetted bounds, generate new.
-	    			// I generate both elements again if one of these two is out of bounds.
-	    			while((r_long<long_min||r_long>long_max)) {
-		    			r_long = BTMath.formatDouble(new_long_min + r1.nextDouble()*(new_long_max - new_long_min));
+			
+			Random r1 = new Random();
+			Random r2 = new Random();
+			
+			int elementCounter = 0;
+			int elementsUniform = (elements*2)/10;
+			
+			double[] xClusterPoints = new double[5];
+			double[] yClusterPoints = new double[5];
+			
+			double clusterRange = 3.1;
+			
+			double generatedLong = 0.0;
+			double generatedLat = 0.0;
+			
+			xClusterPoints[0] = BTMath.findDimensionDistance(long_min, long_max, 5);
+			yClusterPoints[0] = BTMath.findDimensionDistance(lat_min, lat_max, 5);
+			
+			xClusterPoints[1] = BTMath.findDimensionDistance(long_min, long_max, 5);
+			yClusterPoints[1] = BTMath.findDimensionDistance(lat_min, lat_max, 95);
+			
+			xClusterPoints[2] = BTMath.findDimensionDistance(long_min, long_max, 50);
+			yClusterPoints[2] = BTMath.findDimensionDistance(lat_min, lat_max, 50);
+			
+			xClusterPoints[3] = BTMath.findDimensionDistance(long_min, long_max, 95);
+			yClusterPoints[3] = BTMath.findDimensionDistance(lat_min, lat_max, 95);
+			
+			xClusterPoints[4] = BTMath.findDimensionDistance(long_min, long_max, 95);
+			yClusterPoints[4] = BTMath.findDimensionDistance(lat_min, lat_max, 5);
+			
+			//generate 20% of values outside the range of the cluster centers.
+			
+			while(elementCounter<elementsUniform) {
+				
+				generatedLong = BTMath.formatDouble(this.long_min + r1.nextDouble()*(this.long_max - this.long_min));
+				generatedLat = BTMath.formatDouble(this.lat_min + r2.nextDouble()*(this.lat_max - this.lat_min));
+				// if not in the range of any cluster so to be considered to belong to that cluster , insert it to file.
+				if(!(BTMath.inClusterRange(xClusterPoints[0],generatedLong,yClusterPoints[0],generatedLat,clusterRange)||BTMath.inClusterRange(xClusterPoints[1],generatedLong,yClusterPoints[1],generatedLat,clusterRange)
+						||BTMath.inClusterRange(xClusterPoints[2],generatedLong,yClusterPoints[2],generatedLat,clusterRange)||BTMath.inClusterRange(xClusterPoints[3],generatedLong,yClusterPoints[3],generatedLat,clusterRange)
+						||BTMath.inClusterRange(xClusterPoints[4],generatedLong,yClusterPoints[4],generatedLat,clusterRange))) {
+					writer.newLine();
+					writer.append(df.format(generatedLong));
+		    		writer.append(' ');
+		    		writer.append(df.format(generatedLat));
+		    		
+		    		if(generatedLat>max_lat) {
+		    			max_lat = generatedLat;
 		    		}
-	    			while((r_lat<lat_min||r_lat>lat_max)) {
-	    				r_lat = BTMath.formatDouble(new_lat_min + r2.nextDouble()*(new_lat_max - new_lat_min));
-	    			}
-	    			if(r_long>max_long) {
-		    			max_long = r_long;
-		    		}else if(r_long<min_long) {
-		    			min_long = r_long;
+		    		if(generatedLat<min_lat) {
+		    			min_lat = generatedLat;
 		    		}
-		    		if(r_lat>max_lat) {
-		    			max_lat = r_lat;
-		    		}else if(r_lat<min_lat) {
-		    			min_lat = r_lat;
+		    		if(generatedLong>max_long) {
+		    			max_long = generatedLong;
 		    		}
-		    			
-		    		writer.append(String.valueOf(BTMath.formatDouble(r_long)));
-	    	    	writer.append(' ');
-	    	    	writer.append(String.valueOf(BTMath.formatDouble(r_lat)));
-	    	    	
-	    	    	j++;
-	    		}
-	    	}
-	    	writer.close();	
-	    	mins[0] = min_long;
+		    		if(generatedLong<min_long){
+		    			min_long = generatedLong;
+		    		}
+		    		
+		    		elementCounter++;
+				}
+			}
+			while(elementCounter<elements) {
+				generatedLong = BTMath.formatDouble(this.long_min + r1.nextDouble()*(this.long_max - this.long_min));
+				generatedLat = BTMath.formatDouble(this.lat_min + r2.nextDouble()*(this.lat_max - this.lat_min));
+				// if in the range of any cluster so to be considered to belong to that cluster , insert it to file.
+				if((BTMath.inClusterRange(xClusterPoints[0],generatedLong,yClusterPoints[0],generatedLat,clusterRange)||BTMath.inClusterRange(xClusterPoints[1],generatedLong,yClusterPoints[1],generatedLat,clusterRange)
+						||BTMath.inClusterRange(xClusterPoints[2],generatedLong,yClusterPoints[2],generatedLat,clusterRange)||BTMath.inClusterRange(xClusterPoints[3],generatedLong,yClusterPoints[3],generatedLat,clusterRange)
+						||BTMath.inClusterRange(xClusterPoints[4],generatedLong,yClusterPoints[4],generatedLat,clusterRange))) {
+					
+					writer.newLine();
+					writer.append(df.format(generatedLong));
+		    		writer.append(' ');
+		    		writer.append(df.format(generatedLat));
+		    		
+		    		if(generatedLat>max_lat) {
+		    			max_lat = generatedLat;
+		    		}
+		    		if(generatedLat<min_lat) {
+		    			min_lat = generatedLat;
+		    		}
+		    		if(generatedLong>max_long) {
+		    			max_long = generatedLong;
+		    		}
+		    		if(generatedLong<min_long){
+		    			min_long = generatedLong;
+		    		}
+		    		
+		    		elementCounter++;
+				}
+			}
+			writer.close();
+			mins[0] = min_long;
 	    	mins[1] = min_lat;
 	    	maxs[0] = max_long;
 	    	maxs[1] = max_lat;
-	    	System.out.println("DataFile file: "+filename+" was created successfully.");
+			System.out.println("DataFile file: "+filename+" was created successfully.");
 		}
 		return;
 	}
